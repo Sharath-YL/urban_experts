@@ -1,7 +1,7 @@
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
-class FlexibleBottomSheet extends StatelessWidget {
+class FlexibleBottomSheets extends StatelessWidget {
   final double initialHeight;
   final double minHeight;
   final double maxHeight;
@@ -11,7 +11,7 @@ class FlexibleBottomSheet extends StatelessWidget {
   final bool showOnBuild;
   final String? buttonText;
 
-  const FlexibleBottomSheet({
+  const FlexibleBottomSheets({
     super.key,
     this.initialHeight = 0.5,
     this.minHeight = 0.0,
@@ -56,7 +56,7 @@ class FlexibleBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     if (showOnBuild) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        FlexibleBottomSheet.show(
+        FlexibleBottomSheets.show(
           context: context,
           initialHeight: initialHeight,
           minHeight: minHeight,
@@ -71,7 +71,7 @@ class FlexibleBottomSheet extends StatelessWidget {
     if (buttonText != null) {
       return ElevatedButton(
         onPressed:
-            () => FlexibleBottomSheet.show(
+            () => FlexibleBottomSheets.show(
               context: context,
               initialHeight: initialHeight,
               minHeight: minHeight,

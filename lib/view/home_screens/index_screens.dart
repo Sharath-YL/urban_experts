@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/view/bookings/booking_screens.dart';
 import 'package:mychoice/view/home_screens/home_screen.dart';
-import 'package:mychoice/view/offerscreens/offerScreen.dart';
+import 'package:mychoice/view/historyscreens/history_screen.dart';
 import 'package:mychoice/view/profilescreens/profile_screen.dart';
 import 'package:mychoice/viewmodel/bottomview_model/bottomview_provider.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +32,20 @@ class _IndexScreensState extends State<IndexScreens> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const BookingScreens(),
-    const Offerscreen(),
+    const HistoryScreen(),
     const ProfileScreen(),
-  ];
+  ]; 
+
+ @override
+void initState() {
+  super.initState();
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final initial = widget.pageController.initialPage;
+    context.read<BottomnavViewModel>().navindex = initial;
+  });
+}
+
 
   @override
   void dispose() {
@@ -86,7 +97,7 @@ class _IndexScreensState extends State<IndexScreens> {
                 );
               }),
               onItemSelected: (index) {
-                bottomNavProvider.navindex = index; // Update provider
+                bottomNavProvider.navindex = index;
                 widget.pageController.animateToPage(
                   index,
                   duration: const Duration(milliseconds: 300),

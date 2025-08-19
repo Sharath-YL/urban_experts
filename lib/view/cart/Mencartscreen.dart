@@ -4,9 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/custombottomsheet.dart';
 import 'package:mychoice/res/widgets/custombuttons.dart';
-import 'package:mychoice/res/widgets/customcancellationcard.dart';
 import 'package:mychoice/utils/routes/routes.dart';
-import 'package:mychoice/viewmodel/addingmenspackages/adding_menspackagesprovider.dart';
+import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
 import 'package:provider/provider.dart';
 
 class MenCartScreen extends StatefulWidget {
@@ -21,14 +20,13 @@ class _MenCartScreenState extends State<MenCartScreen> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _mapController?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AddingMenspackagesprovider>(
+    return Consumer<CartProvider>(
       builder: (context, provider, child) {
         return Scaffold(
           body: CustomScrollView(
@@ -38,7 +36,6 @@ class _MenCartScreenState extends State<MenCartScreen> {
                 centerTitle: true,
                 leading: IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
                     Navigator.pop(context);
                   },
                   icon: Icon(Icons.arrow_back, color: Appcolor.whitecolor),
@@ -104,26 +101,23 @@ class _MenCartScreenState extends State<MenCartScreen> {
                         ),
                       ),
                       SizedBox(height: 8.0),
-                      _buildSummaryRow('itemtotal', '₹ ${provider.subtotal}'),
+                      _buildSummaryRow('Item Total', '₹${provider.subtotal}'),
                       SizedBox(height: 8.0),
-
                       _buildSummaryRow(
                         'Discount',
-                        '-₹ ${provider.savings}',
+                        '-₹${provider.savings}',
                         isSavings: true,
                       ),
                       SizedBox(height: 8.0),
-
                       _buildSummaryRow(
                         'Total Amount',
-                        '₹ ${provider.total}',
+                        '₹${provider.total}',
                         isBold: true,
                       ),
                       Divider(thickness: 1, color: Appcolor.blackcolor),
-
                       _buildSummaryRow(
                         'Total amount to be paid',
-                        '₹ ${provider.total}',
+                        '₹${provider.total}',
                         isBold: true,
                       ),
                       SizedBox(height: 16.0),
@@ -137,13 +131,13 @@ class _MenCartScreenState extends State<MenCartScreen> {
                       ),
                       SizedBox(height: 5.h),
                       Text(
-                        "Free cancellation if done more than 12 hrs befor the service given or if the vendors isnt assinged ,A fees will be charged ... ",
+                        "Free cancellation if done more than 12 hrs before the service given or if the vendors isn't assigned, a fee will be charged...",
                         style: TextStyle(),
                       ),
                       SizedBox(height: 10.h),
                       GestureDetector(
                         onTap: () {
-                          FlexibleBottomSheet.show(
+                          FlexibleBottomSheets.show(
                             context: context,
                             headerHeight: 56,
                             headerBuilder:
@@ -156,7 +150,7 @@ class _MenCartScreenState extends State<MenCartScreen> {
                                     children: [
                                       const Flexible(
                                         child: Text(
-                                          'Cancelation Policy',
+                                          'Cancellation Policy',
                                           style: TextStyle(
                                             color: Appcolor.whitecolor,
                                             fontSize: 15,
@@ -184,19 +178,9 @@ class _MenCartScreenState extends State<MenCartScreen> {
                           style: TextStyle(color: Appcolor.sucesscolor),
                         ),
                       ),
-
                       SizedBox(height: 10.0.h),
-                      Text(
-                        'Add Tip to Book Fast',
-                        style: TextStyle(
-                          color: Appcolor.blackcolor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      SizedBox(height: 20.0.h),
-                      buildTipsCards(),
 
+                      SizedBox(height: 20.0.h),
                       SizedBox(height: 16.0),
                       ResumeButton(
                         buttonText: "Confirm Booking",
@@ -364,7 +348,7 @@ class _MenCartScreenState extends State<MenCartScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    'okay',
+                    'Okay',
                     style: TextStyle(
                       color: Appcolor.blackcolor,
                       fontWeight: FontWeight.bold,

@@ -5,9 +5,12 @@ import 'package:mychoice/res/widgets/custombottomsheet.dart';
 import 'package:mychoice/res/widgets/custompackagecard.dart';
 import 'package:mychoice/res/widgets/customtopmenswidget.dart';
 import 'package:mychoice/view/Timesedules/timesecdule.dart';
-import 'package:mychoice/view/cart/Mencartscreen.dart';
-import 'package:mychoice/viewmodel/addingmenspackages/adding_menspackagesprovider.dart';
+import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_description_screen.dart';
+import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_pest_controlscreen.dart';
+import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
+import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:video_player/video_player.dart';
 
 class Descriptionscreen extends StatefulWidget {
@@ -19,444 +22,476 @@ class Descriptionscreen extends StatefulWidget {
 }
 
 class _DescriptionscreenState extends State<Descriptionscreen> {
-  late VideoPlayerController _videoPlayerController;
+  VideoPlayerController? _videoPlayerController;
   bool startPlaying = false;
 
   @override
   void initState() {
     super.initState();
-    _videoPlayerController = VideoPlayerController.asset(
-      'assets/vedios/mens_haircutting.mp4',
-    );
-
-    _videoPlayerController.addListener(() {
-      if (startPlaying && !_videoPlayerController.value.isPlaying) {
-        setState(() {});
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<HomescreenviewProvider>(
+        context,
+        listen: false,
+      );
+      // Initialize any required data here
     });
-
-    _videoPlayerController
-        .initialize()
-        .then((_) {
-          setState(() {
-            startPlaying = true;
-          });
-          _videoPlayerController.play();
-        })
-        .catchError((error) {
-          print("Error initializing video: $error");
-        });
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
+    _videoPlayerController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(context, designSize: Size(375, 812));
+    ScreenUtil.init(context, designSize: const Size(375, 812));
+    final homeProvider = Provider.of<HomescreenviewProvider>(context);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    final selectedModel = homeProvider.recentworkmodel.firstWhere(
+      (item) => item.id == widget.id,
+      orElse: () => throw Exception('ID not found'), 
+      
+    );
+
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder:
-            (_, __) => [
-              SliverToBoxAdapter(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      height: 250.h,
-                      width: double.infinity,
-                      child:
-                          _videoPlayerController.value.isInitialized
-                              ? AspectRatio(
-                                aspectRatio:
-                                    _videoPlayerController.value.aspectRatio,
-                                child: VideoPlayer(_videoPlayerController),
-                              )
-                              : Center(child: CircularProgressIndicator()),
-                    ),
-                    Positioned(
-                      top: 50.h,
-                      left: 20.w,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_back, color: Colors.black),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        _videoPlayerController.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 48.sp,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _videoPlayerController.value.isPlaying
-                              ? _videoPlayerController.pause()
-                              : _videoPlayerController.play();
-                        });
-                      },
-                    ),
-                  ],
-                ),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: CircleAvatar(
+            radius: 15,
+            backgroundColor: Appcolor.greycolor,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Appcolor.blackcolor,
+                size: 15,
               ),
-            ],
-        body: SingleChildScrollView(
-          physics: ScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 10.sp,
-                  vertical: 10.dg,
-                ),
-                child: Text(
-                  "Salon Prime",
-                  style: TextStyle(
-                    color: Appcolor.blackcolor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  "⭐ 4.85 (3.3M Bookings) ",
-                  style: TextStyle(
-                    color: Appcolor.blackcolor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10.0.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'Categaries',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Appcolor.blackcolor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Wrap(
-                  spacing: 15.w,
-                  runSpacing: 15.h,
-                  children: [
-                    TopServiceCategoryWidget(
-                      title: 'Massage',
-                      imageUrl:
-                          'https://tse4.mm.bing.net/th/id/OIP.zmkPJBzXBnwOmio5wPd34gHaE8?pid=Api&P=0&h=180',
-                    ),
-                    TopServiceCategoryWidget(
-                      title: 'Hair Cutting',
-                      imageUrl:
-                          'https://tse2.mm.bing.net/th/id/OIP.QQ5l9tWGjowB2CkMwMkV2wHaE8?pid=Api&P=0&h=180',
-                    ),
-                    TopServiceCategoryWidget(
-                      title: 'Hair color',
-                      imageUrl:
-                          'https://tse3.mm.bing.net/th/id/OIP.DsQ0QdtMUWmvYPVq_DKlAgHaEK?pid=Api&P=0&h=180',
-                    ),
-                    TopServiceCategoryWidget(
-                      title: 'Detan',
-                      imageUrl:
-                          'https://tse1.mm.bing.net/th/id/OIP.KHXs0uCJuE-hr-iVMh4MbwAAAA?pid=Api&P=0&h=180',
-                    ),
-                    TopServiceCategoryWidget(
-                      title: 'Facial & Cleanup',
-                      imageUrl:
-                          'https://www.swagmee.com/media/wysiwyg/blog/Why_is_Facial_and_Clean_Up_Important_for_Men.jpg',
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'Pacakges',
-                  style: TextStyle(
-                    color: Appcolor.blackcolor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              PackageCard(
-                ontap: () {
-                  FlexibleBottomSheet.show(
-                    context: context,
-                    initialHeight: 0.5,
-                    minHeight: 0.0,
-                    maxHeight: 0.9,
-                    headerHeight: 56,
-                    headerBuilder:
-                        (context, offset) => Container(
-                          color: Appcolor.primarycolor,
-                          padding: EdgeInsets.all(16.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Haircut & color',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.pop(context),
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    bodyBuilder: (context, offset) {
-                      return Consumer<AddingMenspackagesprovider>(
-                        builder: (context, provider, child) {
-                          return Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  '• Service time: 60 mins',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Haircut or color',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                CheckboxListTile(
-                                  title: const Text('Haircut for men'),
-                                  value: provider.isHaircutSelected,
-                                  onChanged:
-                                      (val) =>
-                                          provider.toggleHaircut(val ?? false),
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                ),
-                                const Text(
-                                  '₹259',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                CheckboxListTile(
-                                  title: const Text(
-                                    'Hair colour application only',
-                                  ),
-                                  value: provider.isHairColorSelected,
-                                  onChanged:
-                                      (val) => provider.toggleHairColor(
-                                        val ?? false,
-                                      ),
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                ),
-                                const Text(
-                                  '₹199',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                CheckboxListTile(
-                                  title: const Text(
-                                    "I don't need haircut or color",
-                                  ),
-                                  value:
-                                      !provider.isHaircutSelected &&
-                                      !provider.isHairColorSelected,
-                                  onChanged: null,
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Hair color (Garnier)',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                ...provider.availableHairColors
-                                    .map(
-                                      (color) => Column(
-                                        children: [
-                                          RadioListTile<String>(
-                                            title: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    color == ''
-                                                        ? "I don't need hair color Garnier"
-                                                        : color +
-                                                            (color ==
-                                                                    'Brown black'
-                                                                ? ' (shade 3)'
-                                                                : color ==
-                                                                    'Deep black'
-                                                                ? ' (shade 1)'
-                                                                : ' (shade 4)'),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                SizedBox(width: 5.0.dg),
-                                                Text(
-                                                  color == '' ? '₹0' : '₹299',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            value: color,
-                                            groupValue:
-                                                provider.selectedHairColor,
-                                            onChanged:
-                                                (val) => provider
-                                                    .setSelectedHairColor(val),
-                                            controlAffinity:
-                                                ListTileControlAffinity.leading,
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                    .toList(),
-                                const SizedBox(height: 16),
-                                if (provider.totalPrice <
-                                    provider.originalPrice)
-                                  Container(
-                                    color: Appcolor.secondarycolor,
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      '🎉 You are saving ₹${provider.originalPrice - provider.totalPrice} in this package',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '₹${provider.totalPrice}',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    if (provider.totalPrice <
-                                        provider.originalPrice)
-                                      Text(
-                                        '₹${provider.originalPrice}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        print(
-                                          "Subtotal before add: ${provider.subtotal}",
-                                        );
-                                        print(
-                                          "TotalPrice before add: ${provider.totalPrice}",
-                                        );
-                                        await provider.addpackagecolor();
-                                        if (!provider.isLoading) {
-                                          final currentProvider = Provider.of<
-                                            AddingMenspackagesprovider
-                                          >(context, listen: false);
-                                          print(
-                                            "Subtotal after add: ${currentProvider.subtotal}",
-                                          );
-                                          print(
-                                            "TotalPrice after add: ${currentProvider.totalPrice}",
-                                          );
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => TimesecduleScreen(),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Appcolor.primarycolor,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8.0,
-                                          ),
-                                        ),
-                                      ),
-                                      child:
-                                          provider.isLoading
-                                              ? const CircularProgressIndicator(
-                                                padding: EdgeInsets.all(8.0),
-                                                strokeWidth: 5.0,
-                                                color: Appcolor.whitecolor,
-                                              )
-                                              : const Text(
-                                                'Add to cart',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-                title: 'Hair Cut',
-                rating: 3.59,
-                reviewCount: 2,
-                price: 500,
-                duration: '60mins',
-                services: ['Hair cutting', 'Hair color'],
-              ),
-              PackageCard(
-                ontap: () {},
-                title: 'Facial and clean',
-                rating: 3.59,
-                reviewCount: 2,
-                price: 3000,
-                duration: '60mins',
-                services: ['Face wash ', 'pedicure'],
-              ),
-            ],
+            ),
           ),
+        ),
+        title: Text(
+          selectedModel.title,
+          style: TextStyle(
+            color: Appcolor.blackcolor,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ),
+      body: Skeletonizer(
+        enabled: homeProvider.isloading || cartProvider.isLoading,
+        child: Consumer2<HomescreenviewProvider, CartProvider>(
+          builder: (context, homeProvider, cartprovider, child) {
+            if (homeProvider.isloading || cartprovider.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(color: Appcolor.blackcolor),
+              );
+            }
+            return Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Controlpestcontrol(
+                title: selectedModel.title,
+                subtitle: selectedModel.ratings,
+                image: selectedModel.imageurl,
+                ontap: () {},
+              ),
+            );
+          },
         ),
       ),
     );
   }
 }
+
+
+
+
+
+// tempory  
+
+
+   // final selectedmodel = provider.recentworkmodel.firstWhere(
+      //   (item) => item.id == widget.id,
+      //   orElse: () => throw Exception('ID not found'),
+      // );
+      // _videoPlayerController = VideoPlayerController.asset(
+      //   selectedmodel.videoUrl ?? "",
+      // );
+
+      // _videoPlayerController?.addListener(() {
+      //   if (startPlaying && !_videoPlayerController!.value.isPlaying) {
+      //     setState(() {});
+      //   }
+      // });
+
+      // _videoPlayerController!
+      //     .initialize()
+      //     .then((_) {
+      //       setState(() {
+      //         startPlaying = true;
+      //       });
+      //       _videoPlayerController?.play();
+      //     })
+      //     .catchError((error) {
+      //       ScaffoldMessenger.of(context).showSnackBar(
+      //         SnackBar(content: Text('Failed to load video: $error')),
+      //       );
+      //     });
+
+  // body:
+      // NestedScrollView(
+      //   headerSliverBuilder:
+      //       (_, __) => [
+      //         SliverToBoxAdapter(
+      //           child: Stack(
+      //             alignment: Alignment.center,
+      //             children: [
+      //               Container(
+      //                 height: 250.h,
+      //                 width: double.infinity,
+      //                 child:
+      //                     _videoPlayerController != null &&
+      //                             _videoPlayerController!.value.isInitialized
+      //                         ? AspectRatio(
+      //                           aspectRatio:
+      //                               _videoPlayerController!.value.aspectRatio,
+      //                           child: VideoPlayer(_videoPlayerController!),
+      //                         )
+      //                         : const Center(
+      //                           child: CircularProgressIndicator(),
+      //                         ),
+      //               ),
+      //               Positioned(
+      //                 top: 50.h,
+      //                 left: 20.w,
+      //                 child: CircleAvatar(
+      //                   backgroundColor: Colors.white,
+      //                   child: IconButton(
+      //                     icon: const Icon(
+      //                       Icons.arrow_back,
+      //                       color: Colors.black,
+      //                     ),
+      //                     onPressed: () => Navigator.pop(context),
+      //                   ),
+      //                 ),
+      //               ),
+      //               if (_videoPlayerController != null &&
+      //                   _videoPlayerController!.value.isInitialized)
+      //                 IconButton(
+      //                   icon: Icon(
+      //                     _videoPlayerController!.value.isPlaying
+      //                         ? Icons.pause
+      //                         : Icons.play_arrow,
+      //                     color: Colors.white,
+      //                     size: 48.sp,
+      //                   ),
+      //                   onPressed: () {
+      //                     setState(() {
+      //                       if (_videoPlayerController!.value.isPlaying) {
+      //                         _videoPlayerController!.pause();
+      //                       } else {
+      //                         _videoPlayerController!.play();
+      //                       }
+      //                     });
+      //                   },
+      //                 ),
+      //             ],
+      //           ),
+      //         ),
+      //       ],
+
+
+
+      
+    // Padding(
+    //   padding: EdgeInsets.symmetric(horizontal: 10.sp),
+    //   child: Text(
+    //     selectedModel.ratings,
+    //     style: TextStyle(
+    //       color: Appcolor.blackcolor,
+    //       fontWeight: FontWeight.bold,
+    //     ),
+    //   ),
+    // ),
+    // SizedBox(height: 10.h),
+    // Padding(
+    //   padding: EdgeInsets.symmetric(horizontal: 10.sp),
+    //   child: Text(
+    //     'Categories',
+    //     style: TextStyle(
+    //       fontSize: 20.sp,
+    //       color: Appcolor.blackcolor,
+    //       fontWeight: FontWeight.bold,
+    //     ),
+    //   ),
+    // ),
+    // Padding(
+    //   padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 10.h),
+    //   child: Wrap(
+    //     spacing: 10.w,
+    //     runSpacing: 10.h,
+    //     children:
+    //         selectedModel.categories.map((category) {
+    //           return TopServiceCategoryWidget(
+    //             title: category['title'],
+    //             imageUrl: category['imageUrl'],
+    //           );
+    //         }).toList(),
+    //   ),
+    // ),
+    // Padding(
+    //   padding: EdgeInsets.symmetric(horizontal: 10.sp),
+    //   child: Text(
+    //     'Packages',
+    //     style: TextStyle(
+    //       color: Appcolor.blackcolor,
+    //       fontWeight: FontWeight.bold,
+    //       fontSize: 20.sp,
+    //     ),
+    //   ),
+    // ),
+    // SizedBox(height: 10.h),
+    // ...selectedModel.packages.map((pkg) {
+    //   return PackageCard(
+    //     title: pkg["title"],
+    //     rating: pkg['rating'],
+    //     reviewCount: pkg['reviewCount'],
+    //     price: pkg['price'],
+    //     duration: pkg['duration'],
+    //     services: List<String>.from(pkg['services']),
+    //     ontap: () {
+    //       FlexibleBottomSheets.show(
+    //         context: context,
+    //         initialHeight: 0.5,
+    //         minHeight: 0.0,
+    //         maxHeight: 0.9,
+    //         headerHeight: 56,
+    //         headerBuilder:
+    //             (context, offset) => Container(
+    //               color: Appcolor.primarycolor,
+    //               padding: const EdgeInsets.all(16.0),
+    //               child: Row(
+    //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                 children: [
+    //                   Text(
+    //                     pkg["title"] ?? '',
+    //                     style: const TextStyle(
+    //                       color: Colors.white,
+    //                       fontSize: 18,
+    //                       fontWeight: FontWeight.bold,
+    //                     ),
+    //                   ),
+    //                   GestureDetector(
+    //                     onTap: () => Navigator.pop(context),
+    //                     child: const Icon(
+    //                       Icons.close,
+    //                       color: Colors.white,
+    //                       size: 24,
+    //                     ),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),
+    //         bodyBuilder: (context, offset) {
+    //           Map<String, String> selectedOptions = {
+    //             for (var option in pkg['options'] ?? [])
+    //               option['type']:
+    //                   (option['values'] as List).firstWhere(
+    //                     (v) => v['price'] == 0,
+    //                   )['label'],
+    //           };
+    //           int totalPrice = pkg['price'];
+    //           int originalPrice = pkg['price'];
+
+    //           return StatefulBuilder(
+    //             builder: (context, setState) {
+    //               return Container(
+    //                 padding: const EdgeInsets.all(16.0),
+    //                 child: Column(
+    //                   mainAxisSize: MainAxisSize.min,
+    //                   crossAxisAlignment: CrossAxisAlignment.start,
+    //                   children: [
+    //                     Text(
+    //                       '• Service time: ${pkg["duration"]}',
+    //                       style: const TextStyle(fontSize: 14),
+    //                     ),
+    //                     const SizedBox(height: 16),
+    //                     const Text(
+    //                       'Package includes:',
+    //                       style: TextStyle(
+    //                         fontSize: 16,
+    //                         fontWeight: FontWeight.bold,
+    //                       ),
+    //                     ),
+    //                     ...List<String>.from(pkg['services']).map((
+    //                       service,
+    //                     ) {
+    //                       return Padding(
+    //                         padding: const EdgeInsets.symmetric(
+    //                           vertical: 4.0,
+    //                         ),
+    //                         child: Row(
+    //                           children: [
+    //                             const Icon(
+    //                               Icons.check,
+    //                               size: 18,
+    //                               color: Colors.green,
+    //                             ),
+    //                             const SizedBox(width: 6),
+    //                             Expanded(child: Text(service)),
+    //                           ],
+    //                         ),
+    //                       );
+    //                     }),
+    //                     const SizedBox(height: 16),
+    //                     ...(pkg['options'] ?? []).map((option) {
+    //                       final type = option['type'] as String;
+    //                       final values =
+    //                           option['values'] as List<dynamic>;
+    //                       return Column(
+    //                         crossAxisAlignment:
+    //                             CrossAxisAlignment.start,
+    //                         children: [
+    //                           Text(
+    //                             type,
+    //                             style: const TextStyle(
+    //                               fontSize: 16,
+    //                               fontWeight: FontWeight.bold,
+    //                             ),
+    //                           ),
+    //                           ...values.map((value) {
+    //                             final label = value['label'] as String;
+    //                             final price = value['price'] as int;
+    //                             return CheckboxListTile(
+    //                               title: Row(
+    //                                 mainAxisAlignment:
+    //                                     MainAxisAlignment.spaceBetween,
+    //                                 children: [
+    //                                   Expanded(child: Text(label)),
+    //                                   Text('₹$price'),
+    //                                 ],
+    //                               ),
+    //                               value: selectedOptions[type] == label,
+    //                               onChanged: (bool? isSelected) {
+    //                                 if (isSelected == true) {
+    //                                   setState(() {
+    //                                     final prevOption = values
+    //                                         .firstWhere(
+    //                                           (v) =>
+    //                                               v['label'] ==
+    //                                               selectedOptions[type],
+    //                                           orElse:
+    //                                               () => {'price': 0},
+    //                                         );
+    //                                     totalPrice =
+    //                                         totalPrice -
+    //                                         (prevOption['price']
+    //                                             as int) +
+    //                                         price;
+    //                                     selectedOptions[type] = label;
+    //                                   });
+    //                                 }
+    //                               },
+    //                               controlAffinity:
+    //                                   ListTileControlAffinity.leading,
+    //                             );
+    //                           }).toList(),
+    //                           const SizedBox(height: 8),
+    //                         ],
+    //                       );
+    //                     }).toList(),
+    //                     if (totalPrice < originalPrice)
+    //                       Container(
+    //                         color: Appcolor.secondarycolor,
+    //                         padding: const EdgeInsets.all(8.0),
+    //                         child: Text(
+    //                           '🎉 You are saving ₹${originalPrice - totalPrice} in this package',
+    //                           style: const TextStyle(
+    //                             color: Colors.white,
+    //                             fontSize: 14,
+    //                           ),
+    //                         ),
+    //                       ),
+    //                     const SizedBox(height: 8),
+    //                     Row(
+    //                       mainAxisAlignment:
+    //                           MainAxisAlignment.spaceBetween,
+    //                       children: [
+    //                         Text(
+    //                           '₹$totalPrice',
+    //                           style: const TextStyle(
+    //                             fontSize: 18,
+    //                             fontWeight: FontWeight.bold,
+    //                           ),
+    //                         ),
+    //                         if (totalPrice < originalPrice)
+    //                           Text(
+    //                             '₹$originalPrice',
+    //                             style: const TextStyle(
+    //                               fontSize: 14,
+    //                               decoration:
+    //                                   TextDecoration.lineThrough,
+    //                             ),
+    //                           ),
+    //                         ElevatedButton(
+    //                           onPressed: () async {
+    //                             if (!homeProvider.isloading) {
+    //                               await cartProvider.addPackageToCart(
+    //                                 package: pkg,
+    //                                 selectedOptions: selectedOptions,
+    //                                 totalPrice: totalPrice,
+    //                                 originalPrice: originalPrice,
+    //                                 // imageurl: im
+    //                               );
+    //                               Navigator.push(
+    //                                 context,
+    //                                 MaterialPageRoute(
+    //                                   builder:
+    //                                       (_) => TimesecduleScreen(),
+    //                                 ),
+    //                               );
+    //                             }
+    //                           },
+    //                           style: ElevatedButton.styleFrom(
+    //                             backgroundColor: Appcolor.primarycolor,
+    //                             shape: RoundedRectangleBorder(
+    //                               borderRadius: BorderRadius.circular(
+    //                                 8.0,
+    //                               ),
+    //                             ),
+    //                           ),
+    //                           child:
+    //                               homeProvider.isloading
+    //                                   ? const CircularProgressIndicator(
+    //                                     strokeWidth: 2.0,
+    //                                     valueColor:
+    //                                         AlwaysStoppedAnimation<
+    //                                           Color
+    //                                         >(Colors.white),
+    //                                   )
+    //                                   : const Text(
+    //                                     'Add to cart',
+    //                                     style: TextStyle(
+    //                                       color: Colors.white,
+    //                                     ),
+    //                                   ),
+    //                         ),
+    //                       ],
+    //                     ),
+    //                   ],
+    //                 ),
+    //               );
+    //             },
+    //           );
+    //         },
+    //       );
+    //     },
+    //   );
+    // }).toList(),
+  
+  

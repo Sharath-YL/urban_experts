@@ -189,11 +189,13 @@ class _LocationScreenState extends State<LocationScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder:(_) =>
-                              IndexScreens(pageController: PageController(initialPage: 0))
-                            ,
+                              builder:
+                                  (_) => IndexScreens(
+                                    pageController: PageController(
+                                      initialPage: 0,
+                                    ),
+                                  ),
                             ),
-                          
                           );
                         } else {
                           locationProvider

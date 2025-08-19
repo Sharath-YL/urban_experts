@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mychoice/res/constants/colors.dart';
+import 'package:mychoice/utils/routes/routes.dart';
 
 class Custommostbookedservices extends StatefulWidget {
   const Custommostbookedservices({super.key});
@@ -11,151 +12,268 @@ class Custommostbookedservices extends StatefulWidget {
 }
 
 class _CustommostbookedservicesState extends State<Custommostbookedservices> {
-  int _currentIndex = 0;
-
-  // List of service images
   final List<String> serviceImages = [
-    "https://tse4.mm.bing.net/th/id/OIP.mZgBe1esdO_u81ju5DI-YwHaE7?pid=Api&P=0&h=180",
-    "https://tse3.mm.bing.net/th/id/OIP.RDN06zToKAL3Lbx9B7OxJgHaDa?pid=Api&P=0&h=180",
-    "https://tse3.mm.bing.net/th/id/OIP.KIZyFbNVIlvn41MHrMC1bgHaE8?pid=Api&P=0&h=180",
-    "https://tse3.mm.bing.net/th/id/OIP.bLpJha5mn3nGDNYZ9MqgpAHaDt?pid=Api&P=0&h=180",
+    "assets/images/man-doing-professional-home-cleaning-service.jpg",
+    "https://images.pexels.com/photos/1054777/pexels-photo-1054777.jpeg",
+    "assets/images/professional-washer-blue-uniform-washing-luxury-car-with-water-gun-open-air-car-wash.jpg",
+    "https://images.pexels.com/photos/209271/pexels-photo-209271.jpeg",
   ];
 
-  // List of service data
   final List<Map<String, dynamic>> services = [
     {
-      "title": "Pest control (includes utensil re...)",
+      "title": "Bathroom Cleaning",
       "rating": 4.79,
       "ratingCount": "113K",
-      "price": "₹1,098",
+      "price": "₹ 1,098",
     },
     {
-      "title": "Apartment pest control (includes ut...)",
+      "title": "Car Cleaning",
       "rating": 4.80,
       "ratingCount": "48K",
-      "price": "₹1,498",
+      "price": "₹ 1,498",
     },
-    {"title": "Bec", "rating": 4.0, "ratingCount": "N/A", "price": "₹1.5"},
     {
-      "title": "Cleaning & Pest Control",
+      "title": "Bathroom Cleaning",
+      "rating": 4.0,
+      "ratingCount": "N/A",
+      "price": "₹ 1,500",
+    },
+    {
+      "title": "Car Cleaning",
       "rating": 4.5,
       "ratingCount": "75K",
-      "price": "₹1,200",
+      "price": "₹ 1,200",
     },
   ];
+
+  bool _isNetwork(String src) {
+    final uri = Uri.tryParse(src);
+    return uri != null && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
+  Widget _buildImage(String src) {
+    if (_isNetwork(src)) {
+      return Image.network(
+        src,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (_, __, ___) =>
+                Icon(Icons.broken_image, size: 28.sp, color: Colors.grey),
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+        },
+      );
+    } else {
+      return Image.asset(
+        src,
+        fit: BoxFit.cover,
+        errorBuilder:
+            (_, __, ___) =>
+                Icon(Icons.broken_image, size: 28.sp, color: Colors.grey),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 5.0.sp, vertical: 5.0.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Text(
-            "Most booked services",
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: Appcolor.blackcolor,
-            ),
-          ),
-          SizedBox(height: 10.0.h),
-          SingleChildScrollView(
+    final mq = MediaQuery.of(context);
+    final clampedMQ = mq.copyWith(
+      textScaleFactor: mq.textScaleFactor.clamp(0.8, 1.2),
+    );
+
+    return MediaQuery(
+      data: clampedMQ,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+        child: SizedBox(
+          height: 260.h,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(services.length, (index) {
-                return Padding(
-                  padding: EdgeInsets.only(right: 15.0.w),
-                  child: Container(
-                    width: 150.w,
-                    height: 220.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      color: Colors.white,
-                      boxShadow: [
-                        // BoxShadow(
-                        //   color: Colors.grey.withOpacity(0.2),
-                        //   spreadRadius: 2,
-                        //   blurRadius: 4,
-                        //   offset: const Offset(0, 2),
-                        // ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(8.r),
-                          ),
-                          child: Image.network(
-                            serviceImages[index],
-                            height: 120.h,
-                            width: 150.w,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.error,
-                                size: 50.sp,
-                                color: Colors.grey,
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            itemCount: services.length,
+            separatorBuilder: (_, __) => SizedBox(width: 14.w),
+            itemBuilder: (context, index) {
+              final item = services[index];
+
+              return ConstrainedBox(
+                constraints: BoxConstraints(minWidth: 200.w, maxWidth: 240.w),
+                child: Container(
+                  width: 220.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        offset: const Offset(0, 6),
+                        blurRadius: 16,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image block with fixed ratio (no explicit height)
+                      Padding(
+                        padding: EdgeInsets.all(8.w),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Stack(
                             children: [
-                              Text(
-                                services[index]["title"],
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: Appcolor.blackcolor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              AspectRatio(
+                                aspectRatio: 16 / 10,
+                                child: _buildImage(serviceImages[index]),
                               ),
-                              SizedBox(height: 4.0.h),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                    size: 16.sp,
+                              Positioned(
+                                left: 8,
+                                bottom: 8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w,
+                                    vertical: 4.h,
                                   ),
-                                  SizedBox(width: 4.0.w),
-                                  Text(
-                                    "${services[index]["rating"]} (${services[index]["ratingCount"]})",
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.65),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 16,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        "${item["rating"]} • ${item["ratingCount"]}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 8,
+                                bottom: 8,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 10.w,
+                                    vertical: 4.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Appcolor.primarycolor.withOpacity(
+                                      0.95,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: Text(
+                                    item["price"],
                                     style: TextStyle(
-                                      fontSize: 12.sp,
-                                      color: Colors.black54,
+                                      color: Colors.white,
+                                      fontSize: 11.5.sp,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 4.0.h),
-                              Text(
-                                services[index]["price"],
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+
+                      // Expandable content so it never overflows the card’s height
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(12.w, 2.h, 12.w, 10.h),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Title wraps/shortens safely
+                              Text(
+                                item["title"],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Appcolor.blackcolor,
+                                  height: 1.2,
+                                ),
+                              ),
+                              SizedBox(height: 6.h),
+
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.verified,
+                                    size: 16.sp,
+                                    color: Appcolor.sucesscolor,
+                                  ),
+                                  SizedBox(width: 6.w),
+                                  Flexible(
+                                    child: Text(
+                                      "Trusted professionals",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 11.5.sp,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // Take up remaining vertical space, pushing the button to the bottom
+                              const Spacer(),
+
+                              SizedBox(
+                                width: double.infinity,
+                                height: 38.h,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Appcolor.blackcolor,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.cleaningpestcontrolscreen,
+                                    );
+                                  },
+                                  child: Text(
+                                    "Book now",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.fade,
+                                    style: TextStyle(
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              }),
-            ),
+                ),
+              );
+            },
           ),
-        ],
+        ),
       ),
     );
   }

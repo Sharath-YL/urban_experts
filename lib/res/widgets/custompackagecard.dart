@@ -1,8 +1,5 @@
-import 'dart:ui';
-
-import 'package:flutter/material.dart' ;
+import 'package:flutter/material.dart';
 import 'package:mychoice/res/constants/colors.dart';
-import 'package:mychoice/utils/toastmessages.dart';
 
 class PackageCard extends StatelessWidget {
   final String title;
@@ -22,122 +19,167 @@ class PackageCard extends StatelessWidget {
     required this.duration,
     required this.services,
     this.borderColor = Appcolor.primarycolor,
-    Key? key,
     required this.ontap,
+    Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: ontap,
       child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Appcolor.primarycolor,
-              Appcolor.blackcolor.withOpacity(0.8),
-            ],
-          ),
-
-          borderRadius: BorderRadius.circular(8.0),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              offset: Offset(0, 8),
+              blurRadius: 24,
+              color: Color(0x1A000000),
+            ),
+          ],
+          border: Border.all(color: const Color(0x11000000)),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              decoration: BoxDecoration(
+                color: borderColor.withOpacity(0.15),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Appcolor.whitecolor,
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: borderColor, width: 2),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.check_circle,
+                      color: borderColor,
+                      size: 20,
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Utils.flushbarSuccessMessage(
-                        'order added to cart',
-                        context,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Appcolor.primarycolor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      title, // your title
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: borderColor.darken(0.4),
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '₹$price • $duration',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Appcolor.blackcolor,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$rating (${reviewCount.toString()} reviews)',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Appcolor.blackcolor.withOpacity(0.7),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  ...services.map(
+                    (s) => Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('• ', style: TextStyle(height: 1.3)),
+                          Expanded(
+                            child: Text(
+                              s,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Appcolor.blackcolor.withOpacity(0.85),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Text(
-                      'Add',
-                      style: TextStyle(color: Colors.white),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton(
+                      onPressed: ontap,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Appcolor.blackcolor.withOpacity(0.15),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        backgroundColor: const Color(0xFFF7F7F8),
+                      ),
+                      child: Text(
+                        'Edit your package',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Appcolor.blackcolor,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8.0),
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 16.0),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    '$rating (${reviewCount.toString()} reviews)',
-                    style: const TextStyle(
-                      color: Appcolor.whitecolor,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                '₹$price • $duration',
-                style: const TextStyle(
-                  fontSize: 12.0,
-                  color: Appcolor.whitecolor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8.0),
-              ...services.map(
-                (service) => Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    '• $service',
-                    style: const TextStyle(
-                      color: Appcolor.whitecolor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8.0),
-              Center(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Appcolor.whitecolor),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  child: const Text(
-                    'Edit your package',
-                    style: TextStyle(
-                      color: Appcolor.whitecolor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+}
+
+extension _ColorX on Color {
+  Color darken([double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(this);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
   }
 }

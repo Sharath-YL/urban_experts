@@ -11,17 +11,17 @@ class Custombutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Bounceable(
-        duration: const Duration(microseconds: 1000),
-        onTap: onPressed,
-        child: Container(
-          height: 50,
-          width: 320,
-          decoration: BoxDecoration(
-            color: Appcolor.primarycolor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-              child: Text(
+      duration: const Duration(microseconds: 1000),
+      onTap: onPressed,
+      child: Container(
+        height: 50,
+        width: 320,
+        decoration: BoxDecoration(
+          color: Appcolor.blackcolor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Text(
             buttonText,
             style: TextStyle(
               fontWeight: FontWeight.bold,
@@ -29,7 +29,9 @@ class Custombutton extends StatelessWidget {
               fontSize: 15,
               // fontFamily: "OpenSans",
             ),
-          )),
-        ));
+          ),
+        ),
+      ),
+    );
   }
 }

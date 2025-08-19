@@ -17,3 +17,18 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+ //exports
+
+ import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mychoice/res/constants/colors.dart';
+import 'package:mychoice/res/widgets/custombottomsheet.dart';
+import 'package:mychoice/res/widgets/custompackagecard.dart';
+import 'package:mychoice/res/widgets/customtopmenswidget.dart';
+import 'package:mychoice/view/Timesedules/timesecdule.dart';
+import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
+import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:flutter_custom_carousel/flutter_custom_carousel.dart';

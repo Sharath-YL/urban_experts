@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:mychoice/res/constants/colors.dart';
 
 class MaterialTheme {
   final TextTheme textTheme;
@@ -11,8 +12,9 @@ class MaterialTheme {
       brightness: Brightness.light,
       primary: Color(0xFF348B5F), // Primary color
       surfaceTint: Color(0xff), // Surface tint
-      onPrimary: Colors
-          .white, // Text color on primary (usually white on darker colors)
+      onPrimary:
+          Colors
+              .white, // Text color on primary (usually white on darker colors)
       primaryContainer: Colors.white, // Lightened primary container color
       onPrimaryContainer: Color(0xFF000000), // color on primary container
       secondary: Color(0xFF736B66), // Secondary color
@@ -65,11 +67,12 @@ class MaterialTheme {
   static ColorScheme darkScheme() {
     return ColorScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF348B5F), // Primary color for dark theme
+      primary: Appcolor.whitecolor, // Primary color for dark theme
       surfaceTint: Color(0xff3572EF), // Surface tint for dark theme
       onPrimary: Color(0xFFB3B3B3), // Text color on primary
-      primaryContainer:
-          Color(0xFF1f1f1f), // Lightened primary container color for dark theme
+      primaryContainer: Color(
+        0xFF1f1f1f,
+      ), // Lightened primary container color for dark theme
       // primaryContainer:
       // Color(0xFF4D4D50),
       onPrimaryContainer: Colors.white, // Text color on primary container
@@ -79,8 +82,9 @@ class MaterialTheme {
       onSecondaryContainer: Colors.white, // Text color on secondary container
       tertiary: Color(0xFF838282), // Tertiary color
       onTertiary: Colors.white, // Text color on tertiary
-      tertiaryContainer:
-          Color(0xFF1f1f1f), // Lightened tertiary container color
+      tertiaryContainer: Color(
+        0xFF1f1f1f,
+      ), // Lightened tertiary container color
       onTertiaryContainer: Colors.grey[600], // Text color on tertiary container
       error: Color(0xFFB00020), // Error color
       onError: Colors.white, // Text color on error
@@ -98,13 +102,16 @@ class MaterialTheme {
       inversePrimary: Color(0xff3572EF), // Inverse primary color
       primaryFixed: Color(0xff3572EF), // Fixed primary color
       onPrimaryFixed: Colors.black, // Text color on fixed primary
-      primaryFixedDim: Colors.blue.withValues(alpha:0.8), // Dimmed primary color
+      primaryFixedDim: Colors.blue.withValues(
+        alpha: 0.8,
+      ), // Dimmed primary color
       onPrimaryFixedVariant: Color(0xFF6C63FF), // Fixed primary variant color
       secondaryFixed: Color(0xFF4D4D50), // Fixed secondary color
       onSecondaryFixed: Colors.white, // Text color on fixed secondary
       secondaryFixedDim: Color(0xFF6C6C6C), // Dimmed fixed secondary color
-      onSecondaryFixedVariant:
-          Color(0xFF9E9E9E), // Fixed secondary variant color
+      onSecondaryFixedVariant: Color(
+        0xFF9E9E9E,
+      ), // Fixed secondary variant color
       tertiaryFixed: Color(0xFFB3B3B3), // Fixed tertiary color
       onTertiaryFixed: Colors.black, // Text color on fixed tertiary
       tertiaryFixedDim: Color(0xFF838282), // Dimmed fixed tertiary color
@@ -114,12 +121,15 @@ class MaterialTheme {
       surfaceContainerLowest:
           Colors.black12, // Lowest container surface in dark theme
       surfaceContainerLow: Colors.black, // Low container surface in dark theme
-      surfaceContainer:
-          Color(0xFF5C5C5C), // Medium container surface in dark theme
-      surfaceContainerHigh:
-          Color(0xFF6C6C6C), // High container surface in dark theme
-      surfaceContainerHighest:
-          Color(0xFF7C7C7C), // Highest container surface in dark theme
+      surfaceContainer: Color(
+        0xFF5C5C5C,
+      ), // Medium container surface in dark theme
+      surfaceContainerHigh: Color(
+        0xFF6C6C6C,
+      ), // High container surface in dark theme
+      surfaceContainerHighest: Color(
+        0xFF7C7C7C,
+      ), // Highest container surface in dark theme
     );
   }
 
@@ -128,16 +138,16 @@ class MaterialTheme {
   }
 
   ThemeData theme(ColorScheme colorScheme) => ThemeData(
-        useMaterial3: true,
-        brightness: colorScheme.brightness,
-        colorScheme: colorScheme,
-        textTheme: textTheme.apply(
-          bodyColor: colorScheme.onSurface,
-          displayColor: colorScheme.onSurface,
-        ),
-        scaffoldBackgroundColor: colorScheme.surface,
-        canvasColor: colorScheme.surface,
-      );
+    useMaterial3: true,
+    brightness: colorScheme.brightness,
+    colorScheme: colorScheme,
+    textTheme: textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+    ),
+    scaffoldBackgroundColor: colorScheme.surface,
+    canvasColor: colorScheme.surface,
+  );
 
   List<ExtendedColor> get extendedColors => [];
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:mychoice/utils/routes/routes.dart';
+import 'package:mychoice/view/home_screens/index_screens.dart';
+import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
 import 'package:mychoice/viewmodel/location_view/location_provider.dart';
 import 'package:mychoice/viewmodel/timesehedules/timesehdule_view_provider.dart';
+import 'package:mychoice/viewmodel/bookingscreenmodels/bookingscreen_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:mychoice/res/constants/colors.dart';
 
@@ -40,11 +42,12 @@ class _ConfirmbookingscreenState extends State<Confirmbookingscreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TimeScheduleViewProvider, LocationProvider>(
-      builder: (context, timeProvider, locationProvider, child) {
+    return Consumer3<TimeScheduleViewProvider, LocationProvider, CartProvider>(
+      builder: (context, timeProvider, locationProvider, cartProvider, child) {
         final String? bookedTime = timeProvider.selectedTimeSlot;
         final DateTime? bookedDate = timeProvider.selectedDate;
         final address = locationProvider.address;
+        final cartItems = cartProvider.cartItems;
 
         return Scaffold(
           body: Container(
@@ -84,7 +87,7 @@ class _ConfirmbookingscreenState extends State<Confirmbookingscreen>
                     ),
                     SizedBox(height: 16.h),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      padding: EdgeInsets.symmetric(horizontal: 30.w),
                       child: Card(
                         elevation: 8.0,
                         shape: RoundedRectangleBorder(
@@ -115,6 +118,74 @@ class _ConfirmbookingscreenState extends State<Confirmbookingscreen>
                                   color: Appcolor.blackcolor,
                                 ),
                               ),
+                              SizedBox(height: 12.h),
+                              if (cartItems.isNotEmpty) ...[
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.apps_outlined,
+                                      color: Appcolor.primarycolor,
+                                      size: 20.sp,
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Text(
+                                      'Selected Package',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Appcolor.blackcolor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                ...cartItems
+                                    .map(
+                                      (item) => Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 4.h,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Appcolor.primarycolor,
+                                              size: 20.sp,
+                                            ),
+                                            SizedBox(width: 8.w),
+                                            Expanded(
+                                              child: Text(
+                                                item['title'],
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Appcolor.blackcolor,
+                                                ),
+                                              ),
+                                            ),
+                                            // Text(
+                                            //   '₹${item['price']}',
+                                            //   style: TextStyle(
+                                            //     fontSize: 16.sp,
+                                            //     fontWeight: FontWeight.w500,
+                                            //     color: Appcolor.blackcolor,
+                                            //   ),
+                                            // ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ] else ...[
+                                Text(
+                                  'No package selected',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Appcolor.blackcolor,
+                                  ),
+                                ),
+                              ],
                               SizedBox(height: 12.h),
                               Row(
                                 children: [
@@ -148,25 +219,41 @@ class _ConfirmbookingscreenState extends State<Confirmbookingscreen>
                                     ),
                                     SizedBox(width: 8.w),
                                     Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (address != null)
-                                            Text(
-                                              address!,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w500,
-                                                color: Appcolor.blackcolor,
-                                              ),
-                                            ),
-                                        ],
+                                      child: Text(
+                                        address,
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Appcolor.blackcolor,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ],
+                              SizedBox(height: 12.h),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Total',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Appcolor.blackcolor,
+                                    ),
+                                  ),
+                                  Text(
+                                    '₹${cartProvider.total}',
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Appcolor.blackcolor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -187,7 +274,27 @@ class _ConfirmbookingscreenState extends State<Confirmbookingscreen>
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>PageController(initialPage: 1)));
+                          Provider.of<BookingProvider>(
+                            context,
+                            listen: false,
+                          ).addBooking(
+                            cartProvider: cartProvider,
+                            timeProvider: timeProvider,
+                            locationProvider: locationProvider,
+                          );
+                          cartProvider.initializeCart();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => IndexScreens(
+                                    pageController: PageController(
+                                      initialPage: 1,
+                                    ),
+                                  ),
+                            ),
+                            (Route) => false,
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Appcolor.primarycolor,

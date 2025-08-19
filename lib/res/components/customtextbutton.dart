@@ -115,7 +115,7 @@ class InputForm extends StatelessWidget {
                 prefixIconColor: Appcolor.blackcolor,
                 hintText: title,
                 hintStyle: TextStyle(
-                  color: Appcolor.primarycolor,
+                  color: Appcolor.blackcolor,
                   fontWeight: FontWeight.w600,
                 ),
                 filled: true,

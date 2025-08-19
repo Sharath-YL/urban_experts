@@ -1,10 +1,16 @@
-// lib/providers/booking_provider.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mychoice/data/models/bookingmodel.dart';
+import 'package:mychoice/data/models/control_pest_model.dart';
+import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
+import 'package:mychoice/viewmodel/control_pest_control_view/contro_pest_provider.dart';
+import 'package:mychoice/viewmodel/location_view/location_provider.dart';
+import 'package:mychoice/viewmodel/timesehedules/timesehdule_view_provider.dart';
 
 class BookingProvider with ChangeNotifier {
   List<Booking> _bookings = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   List<Booking> get bookings => _bookings;
   bool get isLoading => _isLoading;
@@ -13,90 +19,375 @@ class BookingProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await Future.delayed(Duration(seconds: 2));
-
-    _bookings = [
-      Booking(
-        id: '1',
-        title: 'Mens Hair cut',
-        rating: 5.0,
-        price: 2500,
-        duration: '60mins',
-        imageUrl:
-            'https://tse3.mm.bing.net/th/id/OIP.RDN06zToKAL3Lbx9B7OxJgHaDa?pid=Api&P=0&h=180',
-        providerName: 'Sharath',
-        providerImageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-        otp: '5831',
-        service: 'Mens Hair cut',
-        dateTime: 'July 28, 2025, 2:00 PM',
-        address: '#123, Sunshine Apartments, Indiranagar',
-        timeline: [
-          TimelineItem(event: 'Order Placed', time: 'July 28, 2025, 1:00 PM'),
-          TimelineItem(
-            event: 'Provider Assigned',
-            time: 'July 28, 2025, 1:30 PM',
-          ),
-          TimelineItem(event: 'In Progress', time: 'July 28, 2025, 2:00 PM'),
-          TimelineItem(event: 'Completed', time: 'July 28, 2025, 3:00 PM'),
-        ],
-        totalAmount: '₹2,500.00',
-        paymentMode: 'Paid via UPI',
-      ),
-      Booking(
-        id: '2',
-        title: 'AC and Appliances Repair',
-        rating: 3.5,
-        price: 4000,
-        duration: '120mins',
-        imageUrl:
-            'https://tse3.mm.bing.net/th/id/OIP.KIZyFbNVIlvn41MHrMC1bgHaE8?pid=Api&P=0&h=180',
-        providerName: 'Vikram',
-        providerImageUrl: 'https://randomuser.me/api/portraits/men/33.jpg',
-        otp: '9274',
-        service: 'AC Deep Clean',
-        dateTime: 'July 29, 2025, 10:00 AM',
-        address: '#456, Green Valley, Koramangala',
-        timeline: [
-          TimelineItem(event: 'Order Placed', time: 'July 29, 2025, 9:00 AM'),
-          TimelineItem(
-            event: 'Provider Assigned',
-            time: 'July 29, 2025, 9:30 AM',
-          ),
-          TimelineItem(event: 'In Progress', time: 'July 29, 2025, 10:00 AM'),
-          TimelineItem(event: 'Completed', time: 'July 29, 2025, 11:30 AM'),
-        ],
-        totalAmount: '₹4,000.00',
-        paymentMode: 'Paid via Credit Card',
-      ),
-      Booking(
-        id: '3',
-        title: 'cleaning & pest control',
-        rating: 4.5,
-        price: 4500,
-        duration: '100mins',
-        imageUrl:
-            'https://tse3.mm.bing.net/th/id/OIP.bLpJha5mn3nGDNYZ9MqgpAHaDt?pid=Api&P=0&h=180',
-        providerName: 'MAdhi',
-        providerImageUrl: 'https://randomuser.me/api/portraits/men/33.jpg',
-        otp: '9274',
-        service: 'cleaning & pest control',
-        dateTime: 'July 29, 2025, 10:00 AM',
-        address: '#456, hoskerhlli, rrnagar',
-        timeline: [
-          TimelineItem(event: 'Order Placed', time: 'July 29, 2025, 9:00 AM'),
-          TimelineItem(
-            event: 'Provider Assigned',
-            time: 'July 29, 2025, 9:30 AM',
-          ),
-          TimelineItem(event: 'In Progress', time: 'July 29, 2025, 10:00 AM'),
-          TimelineItem(event: 'Completed', time: 'July 29, 2025, 11:30 AM'),
-        ],
-        totalAmount: '₹4,500.00',
-        paymentMode: 'Paid via Credit Card',
-      ),
-    ];
+    await Future.delayed(const Duration(seconds: 1));
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  void addBooking({
+    required CartProvider cartProvider,
+    required TimeScheduleViewProvider timeProvider,
+    required LocationProvider locationProvider,
+  }) {
+    final String? bookedTime = timeProvider.selectedTimeSlot;
+    final DateTime? bookedDate = timeProvider.selectedDate;
+    final String? address = locationProvider.address;
+    final List<Map<String, dynamic>> cartItems = cartProvider.cartItems;
+    final int totalPrice = cartProvider.total;
+
+    if (bookedDate == null ||
+        bookedTime == null ||
+        address == null ||
+        cartItems.isEmpty) {
+      debugPrint("Missing booking details");
+      return;
+    }
+
+    final String imageUrl =
+        cartItems.first['imageurl']?.toString().isNotEmpty == true
+            ? cartItems.first['imageurl']
+            : 'https://tse3.mm.bing.net/th/id/OIP.CU6e8R5wcdDgGuNg82tbewHaDY?pid=Api&P=0&h=180';
+
+    final String dateTime =
+        '${DateFormat('MMM d, yyyy').format(bookedDate)} at $bookedTime';
+    final String bookingId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    final newBooking = Booking(
+      id: bookingId,
+      title: cartItems.first['title'],
+      status: 'Pending',
+      rating: 4.5,
+      price: totalPrice,
+      duration: '60mins',
+      imageurl: imageUrl,
+      providerName: '',
+      providerImageUrl: '',
+      otp: '1234',
+      service: cartItems.first['title'],
+      dateTime: dateTime,
+      address: address,
+      location: address,
+      selectedOptions: cartItems
+          .where((item) => item['title'] != cartItems.first['title'])
+          .toList(),
+      timeline: [
+        TimelineItem(
+          event: 'Order Placed',
+          time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+        ),
+      ],
+      totalAmount: '₹$totalPrice.00',
+      paymentMode: 'Paid via UPI',
+      extraWork: const [],
+      extraWorkApproved: false,
+    );
+
+    _bookings.add(newBooking);
+    notifyListeners();
+
+    _startStatusTransitionTimer(bookingId);
+  }
+
+  int _parseRupees(String s) {
+    final digits = s.replaceAll(RegExp(r'[^\d]'), '');
+    return digits.isEmpty ? 0 : int.parse(digits);
+  }
+
+  String _formatRupees(int amount) => '₹$amount.00';
+
+  void addExtraWork(String bookingId, List<Map<String, dynamic>> newWork) {
+    final i = _bookings.indexWhere((b) => b.id == bookingId);
+    if (i == -1) return;
+    _bookings[i] = _bookings[i].copyWith(
+      extraWork: newWork,
+      timeline: [
+        ..._bookings[i].timeline,
+        TimelineItem(
+          event: 'Additional work proposed',
+          time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+        ),
+      ],
+    );
+    notifyListeners();
+  }
+
+  void approveExtraWork(String bookingId) {
+    final i = _bookings.indexWhere((b) => b.id == bookingId);
+    if (i == -1) return;
+    final b = _bookings[i];
+    final oldTotal = _parseRupees(b.totalAmount);
+    final extraTotal =
+        b.extraWork.fold(0, (sum, e) => sum + ((e['price'] as int?) ?? 0));
+    final newTotal = oldTotal + extraTotal;
+
+    _bookings[i] = b.copyWith(
+      extraWorkApproved: true,
+      totalAmount: _formatRupees(newTotal),
+      timeline: [
+        ...b.timeline,
+        TimelineItem(
+          event: 'Additional work approved',
+          time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+        ),
+      ],
+    );
+    notifyListeners();
+  }
+
+  void rejectExtraWork(String bookingId) {
+    final i = _bookings.indexWhere((b) => b.id == bookingId);
+    if (i == -1) return;
+    final b = _bookings[i];
+    _bookings[i] = b.copyWith(
+      extraWork: const [],
+      extraWorkApproved: false,
+      timeline: [
+        ...b.timeline,
+        TimelineItem(
+          event: 'Additional work rejected',
+          time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+        ),
+      ],
+    );
+    notifyListeners();
+  }
+
+  void addpestcontrolbooking({
+  required TimeScheduleViewProvider timeProvider,
+  required ControPestProvider pestProvider,
+  required String itemId,
+  required LocationProvider locationProvider,
+}) {
+  final String? bookedTime = timeProvider.selectedTimeSlot;
+  final DateTime? bookedDate = timeProvider.selectedDate;
+  final String? address = locationProvider.address ?? "";
+
+  if (bookedDate == null || bookedTime == null || address == null) {
+    debugPrint("Missing booking details for pest control booking");
+    return;
+  }
+
+  try {
+    final ControlPestModel pestItem = pestProvider.items.firstWhere(
+      (item) => item.id == itemId,
+      orElse: () => throw Exception('Pest control item not found'),
+    );
+
+    final List<Map<String, dynamic>> selectedOptions = pestItem.selectedOptions
+        .map((o) {
+          final q = pestProvider.getQty(o.id); 
+          return {
+            'id': o.id,
+            'title': '${o.placename} x$q',
+            'qty': q,
+            'unitPrice': o.price,
+            'price': (o.price ?? 0) * q,
+          };
+        })
+        .where((m) => (m['qty'] as int) > 0) 
+        .toList();
+
+    final int totalPrice = selectedOptions.isNotEmpty
+        ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
+        : pestItem.price;
+
+    final String imageUrl = pestItem.image.isNotEmpty
+        ? pestItem.image
+        : 'https://tse3.mm.bing.net/th/id/OIP.CU6e8R5wcdDgGuNg82tbewHaDY?pid=Api&P=0&h=180';
+
+    _addBookingInternal(
+      bookedTime: bookedTime,
+      bookedDate: bookedDate,
+      address: address,
+      title: pestItem.title,
+      totalPrice: totalPrice,
+      imageUrl: imageUrl,
+      selectedOptions: selectedOptions, 
+      service: pestItem.title,
+      location: pestItem.placename,
+    );
+  } catch (e) {
+    debugPrint("Error adding pest control booking: $e");
+    return;
+  }
+}
+
+
+  void _addBookingInternal({
+    required String bookedTime,
+    required DateTime bookedDate,
+    required String address,
+    required String title,
+    required int totalPrice,
+    required String imageUrl,
+    required List<Map<String, dynamic>> selectedOptions,
+    required String service,
+    String? location,
+  }) {
+    final String dateTime =
+        '${DateFormat('MMM d, yyyy').format(bookedDate)} at $bookedTime';
+    final String bookingId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    final newBooking = Booking(
+      id: bookingId,
+      title: title,
+      status: 'Pending',
+      rating: 4.5,
+      price: totalPrice,
+      duration: '60mins',
+      imageurl: imageUrl,
+      providerName: '',
+      providerImageUrl: '',
+      otp: '1234',
+      service: service,
+      dateTime: dateTime,
+      address: address,
+      location: location ?? address,
+      selectedOptions: selectedOptions,
+      timeline: [
+        TimelineItem(
+          event: 'Order Placed',
+          time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+        ),
+      ],
+      totalAmount: '₹$totalPrice.00',
+      paymentMode: 'Paid via UPI',
+      extraWork: const [],
+      extraWorkApproved: false,
+    );
+
+    _bookings.add(newBooking);
+    notifyListeners();
+
+    _startStatusTransitionTimer(bookingId);
+  }
+
+  void _startStatusTransitionTimer(String bookingId) {
+    Timer(const Duration(seconds: 20), () {
+      final idx = _bookings.indexWhere((b) => b.id == bookingId);
+      if (idx == -1) return;
+
+      final current = _bookings[idx];
+      _bookings[idx] = current.copyWith(
+        status: 'Active',
+        providerName: 'Sharath', 
+      );
+
+      _bookings[idx] = Booking(
+        id: current.id,
+        title: current.title,
+        status: 'Active',
+        rating: current.rating,
+        price: current.price,
+        duration: current.duration,
+        imageurl: current.imageurl,
+        providerName: 'Sharath',
+        providerImageUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
+        otp: current.otp,
+        service: current.service,
+        dateTime: current.dateTime,
+        address: current.address,
+        location: current.location,
+        selectedOptions: current.selectedOptions,
+        timeline: [
+          ...current.timeline,
+          TimelineItem(
+            event: 'Provider Assigned',
+            time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+          ),
+        ],
+        totalAmount: current.totalAmount,
+        paymentMode: current.paymentMode,
+        extraWork: current.extraWork,                
+        extraWorkApproved: current.extraWorkApproved,  
+        isPestControl: current.isPestControl,
+      );
+
+      notifyListeners();
+
+      Timer(const Duration(seconds: 15), () {
+        addExtraWork(bookingId, [
+          {'title': 'Sofa shampoo (3-seater)', 'price': 499},
+          {'title': 'Window deep clean (2 rooms)', 'price': 349},
+        ]);
+      });
+
+      Timer(const Duration(seconds: 20), () {
+        final idx2 = _bookings.indexWhere((b) => b.id == bookingId);
+        if (idx2 == -1) return;
+        final cur = _bookings[idx2];
+
+        _bookings[idx2] = Booking(
+          id: cur.id,
+          title: cur.title,
+          status: 'Completed',
+          rating: cur.rating,
+          price: cur.price,
+          duration: cur.duration,
+          imageurl: cur.imageurl,
+          providerName: cur.providerName,
+          providerImageUrl: cur.providerImageUrl,
+          otp: cur.otp,
+          service: cur.service,
+          dateTime: cur.dateTime,
+          address: cur.address,
+          location: cur.location,
+          selectedOptions: cur.selectedOptions,
+          timeline: [
+            ...cur.timeline,
+            TimelineItem(
+              event: 'Completed',
+              time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+            ),
+          ],
+          totalAmount: cur.totalAmount,
+          paymentMode: cur.paymentMode,
+          extraWork: cur.extraWork,                   
+          extraWorkApproved: cur.extraWorkApproved,  
+          isPestControl: cur.isPestControl,
+        );
+        notifyListeners();
+      });
+    });
+  }
+
+  void cancelBooking(String bookingId) {
+    final idx = _bookings.indexWhere((b) => b.id == bookingId);
+    if (idx == -1) return;
+
+    if (_bookings[idx].status == 'Active') {
+      final cur = _bookings[idx];
+      _bookings[idx] = Booking(
+        id: cur.id,
+        title: cur.title,
+        status: 'Cancelled',
+        rating: cur.rating,
+        price: cur.price,
+        duration: cur.duration,
+        imageurl: cur.imageurl,
+        providerName: cur.providerName,
+        providerImageUrl: cur.providerImageUrl,
+        otp: cur.otp,
+        service: cur.service,
+        dateTime: cur.dateTime,
+        address: cur.address,
+        location: cur.location,
+        selectedOptions: cur.selectedOptions,
+        timeline: [
+          ...cur.timeline,
+          TimelineItem(
+            event: 'Cancelled',
+            time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
+          ),
+        ],
+        totalAmount: cur.totalAmount,
+        paymentMode: cur.paymentMode,
+        extraWork: cur.extraWork,                 
+        extraWorkApproved: cur.extraWorkApproved,  
+        isPestControl: cur.isPestControl,
+      );
+      notifyListeners();
+    }
   }
 }
