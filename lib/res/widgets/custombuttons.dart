@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 
 class ResumeButton extends StatelessWidget {
@@ -16,7 +18,6 @@ class ResumeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use the provided buttonColor, or default to primary color
     return Bounceable(
       duration: const Duration(microseconds: 1000),
       onTap: onPressed,
@@ -26,19 +27,16 @@ class ResumeButton extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               buttonColor ??
-              Appcolor.primarycolor.withOpacity(
-                1,
-              ), // Use buttonColor if provided
+              Appcolor.blackcolor.withOpacity(1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: Text(
             buttonText,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.poppins(
               color: Appcolor.whitecolor,
-              fontSize: 16,
-              fontFamily: "Montserrat",
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

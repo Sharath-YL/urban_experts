@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/components/custombottomsheet.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/custombottomsheet.dart';
@@ -62,7 +63,7 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
       headerHeight: 56,
       headerBuilder:
           (context, offset) => Container(
-            color: Appcolor.primarycolor,
+            color: Appcolor.blackcolor,
             padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,84 +87,103 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
           (context, offset) => Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (lines.isEmpty)
-                  const Text(
-                    'No options selected.',
-                    style: TextStyle(fontSize: 16),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 20.h),
+                    decoration: BoxDecoration(
+                      color: Appcolor.blackcolor.withOpacity(0.03),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Appcolor.blackcolor.withOpacity(0.08),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.receipt_long,
+                          size: 36,
+                          color: Appcolor.blackcolor.withOpacity(0.5),
+                        ),
+                        SizedBox(height: 8.h),
+                        const Text(
+                          'No options selected.',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
                   )
                 else
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: lines.length,
-                    separatorBuilder:
-                        (_, __) => Divider(
-                          thickness: 1,
-                          color: Appcolor.blackcolor.withOpacity(0.2),
-                        ),
-                    itemBuilder: (context, i) {
-                      final l = lines[i];
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${l['name']} x${l['qty']}',
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Appcolor.blackcolor,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-
-                          SizedBox(width: 8.w),
-                          Text(
-                            '₹${l['unit']} × ${l['qty']} = ₹${l['total']}',
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Appcolor.blackcolor,
-                            ),
-                            textAlign: TextAlign.right,
-                          ),
-                        ],
-                      );
-                    },
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.4,
+                    ),
+                    child: ListView.separated(
+                      itemCount: lines.length,
+                      shrinkWrap: true,
+                      separatorBuilder: (_, __) => Divider(),
+                      itemBuilder: (context, i) {
+                        final l = lines[i];
+                        return LineCard(
+                          name: '${l['name']}',
+                          qty: l['qty'] as int,
+                          unit: l['unit'] as int,
+                          total: l['total'] as int,
+                        );
+                      },
+                    ),
                   ),
 
                 if (lines.isNotEmpty) ...[
-                  SizedBox(height: 12.h),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Appcolor.blackcolor,
-                        ),
+                  SizedBox(height: 8.h),
+
+                  Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Appcolor.blackcolor.withOpacity(1),
                       ),
-                      Text(
-                        '₹$grandTotal',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w700,
-                          color: Appcolor.blackcolor,
-                        ),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14.w,
+                        vertical: 12.h,
                       ),
-                    ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w700,
+                              color: Appcolor.blackcolor,
+                            ),
+                          ),
+                          Text(
+                            '₹$grandTotal',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w700,
+                              color: Appcolor.blackcolor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 12.h),
+
+                  SizedBox(height: 20.h),
+
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4.w),
-                    child: GestureDetector(
-                      onTap: () {
+                    child: ResumeButton(
+                      buttonText: "Continue",
+                      onPressed: () {
                         Navigator.pop(context);
                         Navigator.pushNamed(
                           context,
@@ -171,20 +191,6 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
                           arguments: widget.id,
                         );
                       },
-                      child: Container(
-                        height: 60.h,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          color: Appcolor.blackcolor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "continue",
-                            style: TextStyle(color: Appcolor.whitecolor),
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -216,6 +222,7 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
             appBar: AppBar(
               centerTitle: true,
               automaticallyImplyLeading: false,
+              surfaceTintColor: Appcolor.whitecolor,
               leading: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: CircleAvatar(
@@ -233,10 +240,10 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
               ),
               title: Text(
                 item.title,
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   color: Appcolor.blackcolor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -343,13 +350,13 @@ class PestControlDetailWidget extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(
-              color:
-                  isSelected == true
-                      ? Appcolor.blackcolor.withOpacity(0.3)
-                      : Appcolor.greycolor,
-              width: 2,
-            ),
+            // border: Border.all(
+            //   color:
+            //       isSelected == true
+            //           ? Appcolor.blackcolor.withOpacity(0.3)
+            //           : Appcolor.greycolor,
+            //   width: 2,
+            // ),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: EdgeInsets.all(8.sp),
@@ -363,10 +370,10 @@ class PestControlDetailWidget extends StatelessWidget {
                   Expanded(
                     child: Text(
                       place ?? 'Unknown Place',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.poppins(
                         color: Appcolor.blackcolor,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -375,14 +382,13 @@ class PestControlDetailWidget extends StatelessWidget {
                   if (isSelected == true)
                     Icon(
                       Icons.check_circle,
-                      color: Appcolor.primarycolor,
+                      color: Appcolor.blackcolor,
                       size: 20.sp,
                     ),
                 ],
               ),
               SizedBox(height: 10.h),
 
-              // Time & Price + Stepper
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -396,30 +402,28 @@ class PestControlDetailWidget extends StatelessWidget {
                       SizedBox(width: 5.w),
                       Text(
                         time != null ? '$time min' : 'N/A',
-                        style: TextStyle(
-                          fontSize: 14.sp,
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
                   ),
 
-                  // Right side: price + ( + | - qty + )
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         price != null ? '₹$price' : 'N/A',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       SizedBox(width: 8.w),
 
-                      // If quantity is zero -> show single [+]
                       if (quantity == 0)
                         _miniButton(label: '+', onTap: onIncrement)
                       else
@@ -438,10 +442,10 @@ class PestControlDetailWidget extends StatelessWidget {
                               ),
                               child: Text(
                                 '$quantity',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
+                                style: GoogleFonts.poppins(
                                   color: Appcolor.blackcolor,
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
@@ -460,7 +464,7 @@ class PestControlDetailWidget extends StatelessWidget {
                   onTap: onMoreInfo,
                   child: Text(
                     'More Info',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 14.sp,
                       color: Appcolor.primarycolor,
                       fontWeight: FontWeight.bold,
@@ -517,6 +521,102 @@ class EmptyOptions extends StatelessWidget {
               'No options available for this service yet.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LineCard extends StatelessWidget {
+  final String name;
+  final int qty;
+  final int unit;
+  final int total;
+
+  const LineCard({
+    required this.name,
+    required this.qty,
+    required this.unit,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Appcolor.blackcolor.withOpacity(0.08)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          name,
+                          style: GoogleFonts.poppins(
+                            color: Appcolor.blackcolor,
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 8.w,
+                      //     vertical: 4.h,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Appcolor.blackcolor.withOpacity(0.06),
+                      //     borderRadius: BorderRadius.circular(999),
+                      //   ),
+                      //   child: Text(
+                      //     'x$qty',
+                      //     style: GoogleFonts.poppins(
+                      //       color: Appcolor.blackcolor,
+                      //       fontSize: 15.sp,
+                      //       fontWeight: FontWeight.w500,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+
+                  SizedBox(height: 6.h),
+
+                  Text(
+                    '₹$unit each = ₹$unit × $qty = ₹$total',
+                    style: GoogleFonts.poppins(
+                      color: Appcolor.blackcolor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(width: 10.w),
+            Text(
+              '₹$total',
+              style: GoogleFonts.poppins(
+                color: Appcolor.blackcolor,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),

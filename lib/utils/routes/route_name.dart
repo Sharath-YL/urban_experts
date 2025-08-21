@@ -13,11 +13,16 @@ import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_description_
 import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_pest_controlscreen.dart';
 import 'package:mychoice/view/cleaning_pestcontrol_screens/pestcontrol_confirmation_screen.dart';
 import 'package:mychoice/view/cleaning_pestcontrol_screens/pestcontrol_timeselection.dart';
-import 'package:mychoice/view/descriptions/descriptionscreen.dart';
+import 'package:mychoice/view/descriptions/commonservices_decriptionscreen.dart';
+import 'package:mychoice/view/descriptions/commonservicesscreen.dart';
 import 'package:mychoice/view/home_screens/home_screen.dart';
 import 'package:mychoice/view/home_screens/notifications_screen.dart';
 import 'package:mychoice/view/locationscreens/location_screen.dart';
 import 'package:mychoice/view/onboardingscreens/onboardingscreen.dart';
+import 'package:mychoice/view/profilescreens/editprofile_screen.dart';
+import 'package:mychoice/view/profilescreens/privacy_policyscreen.dart';
+import 'package:mychoice/view/profilescreens/profile_screen.dart';
+import 'package:mychoice/view/profilescreens/terms_conditions_screen.dart';
 
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -26,11 +31,31 @@ class Routes {
         return MaterialPageRoute(builder: (context) => HomeScreen());
       case RouteName.login:
         return MaterialPageRoute(builder: (context) => Loginscreen());
-      case RouteName.description:
+      case RouteName.commonservicescreen:
         final id = settings.arguments;
         if (id is String) {
           return MaterialPageRoute(
-            builder: (context) => Descriptionscreen(id: id),
+            builder: (context) => Commonservicesscreen(id: id),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder:
+                (context) => Scaffold(
+                  body: Center(
+                    child: Text(
+                      'Error: Invalid or missing service ID',
+                      style: TextStyle(fontSize: 18, color: Colors.red),
+                    ),
+                  ),
+                ),
+          );
+        }
+
+      case RouteName.commonservicesdescriptionscreen:
+        final id = settings.arguments;
+        if (id is String) {
+          return MaterialPageRoute(
+            builder: (context) => CommonservicesDecriptionscreen(id: id),
           );
         } else {
           return MaterialPageRoute(
@@ -66,16 +91,50 @@ class Routes {
       case RouteName.bookingscreen:
         return MaterialPageRoute(builder: (context) => BookingScreens());
       case RouteName.timesechudlescreen:
-        return MaterialPageRoute(builder: (context) => TimesecduleScreen());
+        final id = settings.arguments;
+        if (id is String) {
+          return MaterialPageRoute(
+            builder: (context) => TimesecduleScreen(id: id),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder:
+                (_) => const Scaffold(
+                  body: Center(child: Text('Error: Booking data not provided')),
+                ),
+          );
+        }
+
       case RouteName.confirmbookingscreen:
-        return MaterialPageRoute(builder: (context) => Confirmbookingscreen());
+        final id = settings.arguments;
+        if (id is String) {
+          return MaterialPageRoute(
+            builder: (context) => Confirmbookingscreen(id: id),
+          );
+        } else {
+          return MaterialPageRoute(
+            builder:
+                (_) => const Scaffold(
+                  body: Center(child: Text('Error: Booking data not provided')),
+                ),
+          );
+        }
+
       case RouteName.signupscreen:
         return MaterialPageRoute(builder: (context) => Signupscreen());
+      case RouteName.privacypolicyscreen:
+        return MaterialPageRoute(builder: (context) => PrivacyPolicyscreen());
+      case RouteName.termsofservices:
+        return MaterialPageRoute(builder: (context) => TermsConditionsScreen());
 
       case RouteName.OtpScreen:
-        return MaterialPageRoute(builder: (context) => Otpscreen());
+        return MaterialPageRoute(builder: (context) => Otpscreen()); 
+      case RouteName.profilescreen: 
+        return MaterialPageRoute(builder: (context)=>ProfileScreen());
       case RouteName.locationscreen:
-        return MaterialPageRoute(builder: (context) => LocationScreen());
+        return MaterialPageRoute(builder: (context) => LocationScreen()); 
+      case RouteName.editprofilescreen: 
+        return MaterialPageRoute(builder: (context)=>EditprofileScreen());
 
       case RouteName.notificationscreen:
         return MaterialPageRoute(builder: (context) => NotificationsScreen());

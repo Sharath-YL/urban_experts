@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mychoice/data/models/bookingmodel.dart';
 import 'package:mychoice/data/models/control_pest_model.dart';
+import 'package:mychoice/data/models/recentworkmodel.dart';
 import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
 import 'package:mychoice/viewmodel/control_pest_control_view/contro_pest_provider.dart';
+import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
 import 'package:mychoice/viewmodel/location_view/location_provider.dart';
 import 'package:mychoice/viewmodel/timesehedules/timesehdule_view_provider.dart';
 
@@ -26,36 +28,61 @@ class BookingProvider with ChangeNotifier {
   }
 
   void addBooking({
-    required CartProvider cartProvider,
     required TimeScheduleViewProvider timeProvider,
     required LocationProvider locationProvider,
+    required HomescreenviewProvider homeprovider,
+    required String itemId,
   }) {
     final String? bookedTime = timeProvider.selectedTimeSlot;
     final DateTime? bookedDate = timeProvider.selectedDate;
     final String? address = locationProvider.address;
-    final List<Map<String, dynamic>> cartItems = cartProvider.cartItems;
-    final int totalPrice = cartProvider.total;
 
-    if (bookedDate == null ||
-        bookedTime == null ||
-        address == null ||
-        cartItems.isEmpty) {
+    if (bookedDate == null || bookedTime == null || address == null
+    // cartItems.isEmpty
+    ) {
       debugPrint("Missing booking details");
       return;
     }
 
+    final Recentworkmodel serviceitem = homeprovider.recentworkmodel.firstWhere(
+      (item) => item.id == itemId,
+      orElse: () => throw Exception('Pest control item not found'),
+    );
     final String imageUrl =
-        cartItems.first['imageurl']?.toString().isNotEmpty == true
-            ? cartItems.first['imageurl']
+        serviceitem.imageurl.isNotEmpty
+            ? serviceitem.imageurl
             : 'https://tse3.mm.bing.net/th/id/OIP.CU6e8R5wcdDgGuNg82tbewHaDY?pid=Api&P=0&h=180';
 
     final String dateTime =
         '${DateFormat('MMM d, yyyy').format(bookedDate)} at $bookedTime';
     final String bookingId = DateTime.now().millisecondsSinceEpoch.toString();
 
+    final List<Map<String, dynamic>> selectedOptions =
+        serviceitem.selectedoptoins
+            .map((o) {
+              final q = homeprovider.getQty(o.id);
+              return {
+                'id': o.id,
+                'title': '${o.placename} x$q',
+                'qty': q,
+                'unitPrice': o.price,
+                'price': (o.price ?? 0) * q,
+              };
+            })
+            .where((m) => (m['qty'] as int) > 0)
+            .toList();
+
+    int _toInt(dynamic v) =>
+        v is num ? v.toInt() : int.tryParse('${v ?? ''}') ?? 0;
+
+       final int totalPrice =
+          selectedOptions.isNotEmpty
+              ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
+              : serviceitem.price;
+
     final newBooking = Booking(
       id: bookingId,
-      title: cartItems.first['title'],
+      title: serviceitem.title,
       status: 'Pending',
       rating: 4.5,
       price: totalPrice,
@@ -64,20 +91,19 @@ class BookingProvider with ChangeNotifier {
       providerName: '',
       providerImageUrl: '',
       otp: '1234',
-      service: cartItems.first['title'],
+      service: serviceitem.title,
       dateTime: dateTime,
       address: address,
       location: address,
-      selectedOptions: cartItems
-          .where((item) => item['title'] != cartItems.first['title'])
-          .toList(),
+      totalAmount: totalPrice.toString(),
+
+      selectedOptions: selectedOptions,
       timeline: [
         TimelineItem(
           event: 'Order Placed',
           time: DateFormat('MMM d, yyyy, h:mm a').format(DateTime.now()),
         ),
       ],
-      totalAmount: '₹$totalPrice.00',
       paymentMode: 'Paid via UPI',
       extraWork: const [],
       extraWorkApproved: false,
@@ -117,8 +143,10 @@ class BookingProvider with ChangeNotifier {
     if (i == -1) return;
     final b = _bookings[i];
     final oldTotal = _parseRupees(b.totalAmount);
-    final extraTotal =
-        b.extraWork.fold(0, (sum, e) => sum + ((e['price'] as int?) ?? 0));
+    final extraTotal = b.extraWork.fold(
+      0,
+      (sum, e) => sum + ((e['price'] as int?) ?? 0),
+    );
     final newTotal = oldTotal + extraTotal;
 
     _bookings[i] = b.copyWith(
@@ -154,65 +182,67 @@ class BookingProvider with ChangeNotifier {
   }
 
   void addpestcontrolbooking({
-  required TimeScheduleViewProvider timeProvider,
-  required ControPestProvider pestProvider,
-  required String itemId,
-  required LocationProvider locationProvider,
-}) {
-  final String? bookedTime = timeProvider.selectedTimeSlot;
-  final DateTime? bookedDate = timeProvider.selectedDate;
-  final String? address = locationProvider.address ?? "";
+    required TimeScheduleViewProvider timeProvider,
+    required ControPestProvider pestProvider,
+    required String itemId,
+    required LocationProvider locationProvider,
+  }) {
+    final String? bookedTime = timeProvider.selectedTimeSlot;
+    final DateTime? bookedDate = timeProvider.selectedDate;
+    final String? address = locationProvider.address ?? "";
 
-  if (bookedDate == null || bookedTime == null || address == null) {
-    debugPrint("Missing booking details for pest control booking");
-    return;
+    if (bookedDate == null || bookedTime == null || address == null) {
+      debugPrint("Missing booking details for pest control booking");
+      return;
+    }
+
+    try {
+      final ControlPestModel pestItem = pestProvider.items.firstWhere(
+        (item) => item.id == itemId,
+        orElse: () => throw Exception('Pest control item not found'),
+      );
+
+      final List<Map<String, dynamic>> selectedOptions =
+          pestItem.selectedOptions
+              .map((o) {
+                final q = pestProvider.getQty(o.id);
+                return {
+                  'id': o.id,
+                  'title': '${o.placename} x$q',
+                  'qty': q,
+                  'unitPrice': o.price,
+                  'price': (o.price ?? 0) * q,
+                };
+              })
+              .where((m) => (m['qty'] as int) > 0)
+              .toList();
+
+      final int totalPrice =
+          selectedOptions.isNotEmpty
+              ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
+              : pestItem.price;
+
+      final String imageUrl =
+          pestItem.image.isNotEmpty
+              ? pestItem.image
+              : 'https://tse3.mm.bing.net/th/id/OIP.CU6e8R5wcdDgGuNg82tbewHaDY?pid=Api&P=0&h=180';
+
+      _addBookingInternal(
+        bookedTime: bookedTime,
+        bookedDate: bookedDate,
+        address: address,
+        title: pestItem.title,
+        totalPrice: totalPrice,
+        imageUrl: imageUrl,
+        selectedOptions: selectedOptions,
+        service: pestItem.title,
+        location: pestItem.placename,
+      );
+    } catch (e) {
+      debugPrint("Error adding pest control booking: $e");
+      return;
+    }
   }
-
-  try {
-    final ControlPestModel pestItem = pestProvider.items.firstWhere(
-      (item) => item.id == itemId,
-      orElse: () => throw Exception('Pest control item not found'),
-    );
-
-    final List<Map<String, dynamic>> selectedOptions = pestItem.selectedOptions
-        .map((o) {
-          final q = pestProvider.getQty(o.id); 
-          return {
-            'id': o.id,
-            'title': '${o.placename} x$q',
-            'qty': q,
-            'unitPrice': o.price,
-            'price': (o.price ?? 0) * q,
-          };
-        })
-        .where((m) => (m['qty'] as int) > 0) 
-        .toList();
-
-    final int totalPrice = selectedOptions.isNotEmpty
-        ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
-        : pestItem.price;
-
-    final String imageUrl = pestItem.image.isNotEmpty
-        ? pestItem.image
-        : 'https://tse3.mm.bing.net/th/id/OIP.CU6e8R5wcdDgGuNg82tbewHaDY?pid=Api&P=0&h=180';
-
-    _addBookingInternal(
-      bookedTime: bookedTime,
-      bookedDate: bookedDate,
-      address: address,
-      title: pestItem.title,
-      totalPrice: totalPrice,
-      imageUrl: imageUrl,
-      selectedOptions: selectedOptions, 
-      service: pestItem.title,
-      location: pestItem.placename,
-    );
-  } catch (e) {
-    debugPrint("Error adding pest control booking: $e");
-    return;
-  }
-}
-
 
   void _addBookingInternal({
     required String bookedTime,
@@ -271,7 +301,7 @@ class BookingProvider with ChangeNotifier {
       final current = _bookings[idx];
       _bookings[idx] = current.copyWith(
         status: 'Active',
-        providerName: 'Sharath', 
+        providerName: 'Sharath',
       );
 
       _bookings[idx] = Booking(
@@ -299,8 +329,8 @@ class BookingProvider with ChangeNotifier {
         ],
         totalAmount: current.totalAmount,
         paymentMode: current.paymentMode,
-        extraWork: current.extraWork,                
-        extraWorkApproved: current.extraWorkApproved,  
+        extraWork: current.extraWork,
+        extraWorkApproved: current.extraWorkApproved,
         isPestControl: current.isPestControl,
       );
 
@@ -343,8 +373,8 @@ class BookingProvider with ChangeNotifier {
           ],
           totalAmount: cur.totalAmount,
           paymentMode: cur.paymentMode,
-          extraWork: cur.extraWork,                   
-          extraWorkApproved: cur.extraWorkApproved,  
+          extraWork: cur.extraWork,
+          extraWorkApproved: cur.extraWorkApproved,
           isPestControl: cur.isPestControl,
         );
         notifyListeners();
@@ -383,8 +413,8 @@ class BookingProvider with ChangeNotifier {
         ],
         totalAmount: cur.totalAmount,
         paymentMode: cur.paymentMode,
-        extraWork: cur.extraWork,                 
-        extraWorkApproved: cur.extraWorkApproved,  
+        extraWork: cur.extraWork,
+        extraWorkApproved: cur.extraWorkApproved,
         isPestControl: cur.isPestControl,
       );
       notifyListeners();

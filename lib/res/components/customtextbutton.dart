@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 
 class AppTextButton extends StatelessWidget {
@@ -114,9 +116,9 @@ class InputForm extends StatelessWidget {
                         : null,
                 prefixIconColor: Appcolor.blackcolor,
                 hintText: title,
-                hintStyle: TextStyle(
+                hintStyle: GoogleFonts.poppins(
                   color: Appcolor.blackcolor,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 filled: true,
                 fillColor: colorscheme.primaryContainer,
@@ -144,6 +146,163 @@ class InputForm extends StatelessWidget {
                   return null;
                 }
               },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ResumeTextfield extends StatelessWidget {
+  final String label;
+  final String? hint;
+  final TextEditingController? controller;
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
+  final bool enabled;
+  final bool obscureText;
+  final int maxLines;
+  final int? maxLength;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final String? helperText;
+  final String? initialValue;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final VoidCallback? onTap;
+  final FocusNode? focusNode;
+  final EdgeInsetsGeometry? margin;
+
+  const ResumeTextfield({
+    super.key,
+    required this.label,
+    this.hint,
+    this.controller,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
+    this.inputFormatters,
+    this.readOnly = false,
+    this.enabled = true,
+    this.obscureText = false,
+    this.maxLines = 1,
+    this.maxLength,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.helperText,
+    this.initialValue,
+    this.validator,
+    this.onChanged,
+    this.onTap,
+    this.focusNode,
+    this.margin,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme);
+
+    return Focus(
+      child: Builder(
+        builder: (ctx) {
+          final isFocused = Focus.of(ctx).hasFocus;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            margin: margin ?? EdgeInsets.only(bottom: 14.h),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [
+                BoxShadow(
+                  color:
+                      isFocused
+                          ? Appcolor.blackcolor.withOpacity(0.10)
+                          : Appcolor.blackcolor.withOpacity(0.03),
+                  blurRadius: isFocused ? 16 : 10,
+                  spreadRadius: isFocused ? 1 : 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: controller,
+              initialValue: controller == null ? initialValue : null,
+              focusNode: focusNode,
+              onTap: onTap,
+              onChanged: onChanged,
+              validator: validator,
+              keyboardType: keyboardType,
+              inputFormatters: inputFormatters,
+              obscureText: obscureText,
+              readOnly: readOnly,
+              enabled: enabled,
+              maxLines: maxLines,
+              maxLength: maxLength,
+              textInputAction: textInputAction,
+              style: textTheme.bodyMedium?.copyWith(
+                color: Appcolor.blackcolor,
+                fontWeight: FontWeight.w500,
+                fontSize: 18.sp,
+              ),
+              decoration: InputDecoration(
+                counterText: '',
+                labelText: label,
+                hintText: hint,
+                filled: true,
+                fillColor: Appcolor.whitecolor,
+                prefixIcon: prefixIcon,
+                suffixIcon: suffixIcon,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 14.h,
+                ),
+                labelStyle: textTheme.labelLarge?.copyWith(
+                  fontSize: 15,
+                  color:
+                      isFocused
+                          ? Appcolor.blackcolor.withOpacity(0.80)
+                          : Appcolor.blackcolor.withOpacity(0.60),
+                  fontWeight: FontWeight.w600,
+                ),
+                hintStyle: textTheme.bodyMedium?.copyWith(
+                  fontSize: 15,
+                  color: Appcolor.blackcolor.withOpacity(0.40),
+                ),
+                helperText: helperText,
+                helperStyle: textTheme.bodySmall?.copyWith(
+                  color: Appcolor.blackcolor.withOpacity(0.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide(
+                    color: Appcolor.blackcolor.withOpacity(0.08),
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide(
+                    color: Appcolor.blackcolor.withOpacity(0.20),
+                    width: 1.2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide(
+                    color: Colors.red.withOpacity(0.7),
+                    width: 1.2,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                  borderSide: BorderSide(
+                    color: Colors.red.withOpacity(0.9),
+                    width: 1.2,
+                  ),
+                ),
+              ),
             ),
           );
         },

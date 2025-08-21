@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 
@@ -28,36 +30,39 @@ class _OnboardingscreenState extends State<Onboardingscreen> {
             left: 24,
             right: 24,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Image.asset(
-                      "assets/images/onboarding.png",
-                      height: 50,
-                      width: 50,
-                      color: Appcolor.whitecolor,
-                    ),
-                    const SizedBox(width: 5),
-                    const Text(
-                      "Urban Experts",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                Padding(
+                  padding: EdgeInsets.only(right: 20),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        "assets/images/onboarding.png",
+                        height: 50,
+                        width: 50,
+                        color: Appcolor.whitecolor,
                       ),
-                    ),
-                  ],
+                      // const SizedBox(width: 2),
+                      Text(
+                        "Urban Experts",
+                        style: GoogleFonts.poppins(
+                          color: Appcolor.whitecolor,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
 
-                const Text(
+                Text(
                   "All services on\nyour fingertips.",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+                  style: GoogleFonts.poppins(
+                    color: Appcolor.whitecolor,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w600,
-                    height: 1.3,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -76,16 +81,20 @@ class _OnboardingscreenState extends State<Onboardingscreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Log In",
-                          style: TextStyle(color: Colors.white),
+                          style: GoogleFonts.poppins(
+                            color: Appcolor.whitecolor,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () { 
+                        onPressed: () {
                           Navigator.pushNamed(context, RouteName.signupscreen);
                         },
                         style: OutlinedButton.styleFrom(
@@ -95,9 +104,13 @@ class _OnboardingscreenState extends State<Onboardingscreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Sign Up",
-                          style: TextStyle(color: Colors.white),
+                          style: GoogleFonts.poppins(
+                            color: Appcolor.whitecolor,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),

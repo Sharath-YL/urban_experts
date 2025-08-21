@@ -4,7 +4,7 @@ class Booking {
   final String id;
   final String title;
   final double rating;
-  final int price;
+  final int? price;
   final String duration;
   final String imageurl;
   final String providerName;
@@ -29,7 +29,7 @@ class Booking {
     required this.title,
     required this.status,
     required this.rating,
-    required this.price,
+     this.price,
     required this.duration,
     required this.imageurl,
     required this.providerName,

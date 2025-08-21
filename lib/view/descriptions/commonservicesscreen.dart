@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
-import 'package:mychoice/res/widgets/custombottomsheet.dart';
-import 'package:mychoice/res/widgets/custompackagecard.dart';
-import 'package:mychoice/res/widgets/customtopmenswidget.dart';
-import 'package:mychoice/view/Timesedules/timesecdule.dart';
-import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_description_screen.dart';
+import 'package:mychoice/utils/routes/routes.dart';
 import 'package:mychoice/view/cleaning_pestcontrol_screens/cleaning_pest_controlscreen.dart';
 import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
 import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:video_player/video_player.dart';
 
-class Descriptionscreen extends StatefulWidget {
+class Commonservicesscreen extends StatefulWidget {
   final String id;
-  const Descriptionscreen({super.key, required this.id});
+  const Commonservicesscreen({super.key, required this.id});
 
   @override
-  State<Descriptionscreen> createState() => _DescriptionscreenState();
+  State<Commonservicesscreen> createState() => _CommonservicesscreenState();
 }
 
-class _DescriptionscreenState extends State<Descriptionscreen> {
-  VideoPlayerController? _videoPlayerController;
+class _CommonservicesscreenState extends State<Commonservicesscreen> {
   bool startPlaying = false;
 
   @override
@@ -33,14 +28,8 @@ class _DescriptionscreenState extends State<Descriptionscreen> {
         context,
         listen: false,
       );
-      // Initialize any required data here
+      provider.getworkdetails();
     });
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController?.dispose();
-    super.dispose();
   }
 
   @override
@@ -49,11 +38,35 @@ class _DescriptionscreenState extends State<Descriptionscreen> {
     final homeProvider = Provider.of<HomescreenviewProvider>(context);
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
-    final selectedModel = homeProvider.recentworkmodel.firstWhere(
-      (item) => item.id == widget.id,
-      orElse: () => throw Exception('ID not found'), 
-      
+    final idx = homeProvider.recentworkmodel.indexWhere(
+      (e) => e.id == widget.id,
     );
+    final selectedModel = idx == -1 ? null : homeProvider.recentworkmodel[idx];
+
+    if (selectedModel == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Error',
+            style: GoogleFonts.poppins(
+              color: Appcolor.whitecolor,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        body: Center(
+          child: Text(
+            'Item not found',
+            style: GoogleFonts.poppins(
+              color: Appcolor.whitecolor,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -76,10 +89,10 @@ class _DescriptionscreenState extends State<Descriptionscreen> {
         ),
         title: Text(
           selectedModel.title,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Appcolor.blackcolor,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
@@ -92,13 +105,46 @@ class _DescriptionscreenState extends State<Descriptionscreen> {
                 child: CircularProgressIndicator(color: Appcolor.blackcolor),
               );
             }
-            return Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Controlpestcontrol(
-                title: selectedModel.title,
-                subtitle: selectedModel.ratings,
-                image: selectedModel.imageurl,
-                ontap: () {},
+            return SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: selectedModel.packages.length,
+                      itemBuilder: (context, index) {
+                        final Map<String, dynamic> package =
+                            Map<String, dynamic>.from(
+                              selectedModel.packages[index],
+                            );
+
+                        final String title =
+                            (package['title'] as String?)?.trim() ?? 'No Title';
+                        final String subtitle =
+                            (package['subtitle'] as String?)?.trim() ??
+                            'No subtitle';
+                        final String image =
+                            (package['image'] as String?)?.trim() ?? '';
+
+                        return Controlpestcontrol(
+                          title: title,
+                          subtitle: subtitle,
+                          image: image,
+                          ontap: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteName.commonservicesdescriptionscreen,
+                              arguments: widget.id,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -107,9 +153,6 @@ class _DescriptionscreenState extends State<Descriptionscreen> {
     );
   }
 }
-
-
-
 
 
 // tempory  

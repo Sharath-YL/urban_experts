@@ -1,6 +1,7 @@
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/view/bookings/booking_screens.dart';
 import 'package:mychoice/view/home_screens/home_screen.dart';
@@ -34,18 +35,17 @@ class _IndexScreensState extends State<IndexScreens> {
     const BookingScreens(),
     const HistoryScreen(),
     const ProfileScreen(),
-  ]; 
+  ];
 
- @override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final initial = widget.pageController.initialPage;
-    context.read<BottomnavViewModel>().navindex = initial;
-  });
-}
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final initial = widget.pageController.initialPage;
+      context.read<BottomnavViewModel>().navindex = initial;
+    });
+  }
 
   @override
   void dispose() {
@@ -80,18 +80,19 @@ void initState() {
                     size: bottomNavProvider.navindex == index ? 22.sp : 20.sp,
                     color:
                         bottomNavProvider.navindex == index
-                            ? Appcolor.primarycolor
-                            : Appcolor.blackcolor,
+                            ? Appcolor.blackcolor
+                            : Colors.grey,
                   ),
                   title: Text(
                     labels[index],
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize:
                           bottomNavProvider.navindex == index ? 14.sp : 12.sp,
+                      fontWeight: FontWeight.bold,
                       color:
                           bottomNavProvider.navindex == index
-                              ? Appcolor.primarycolor
-                              : Appcolor.blackcolor,
+                              ? Appcolor.blackcolor
+                              : Colors.grey,
                     ),
                   ),
                 );

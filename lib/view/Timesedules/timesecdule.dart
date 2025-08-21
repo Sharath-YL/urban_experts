@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:mychoice/data/models/recentworkmodel.dart';
 import 'package:mychoice/res/components/customtextbutton.dart';
 import 'package:mychoice/res/constants/colors.dart';
-import 'package:mychoice/res/widgets/custombottomsheet.dart';
-import 'package:mychoice/res/widgets/customsearchbar.dart';
 import 'package:mychoice/res/widgets/customButton.dart';
+import 'package:mychoice/res/widgets/custombuttons.dart';
 import 'package:mychoice/utils/routes/routes.dart';
+import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
 import 'package:mychoice/viewmodel/location_view/location_provider.dart';
 import 'package:mychoice/viewmodel/timesehedules/timesehdule_view_provider.dart';
 import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
 import 'package:provider/provider.dart';
 
 class TimesecduleScreen extends StatefulWidget {
-  const TimesecduleScreen({super.key});
+  final String id;
+  const TimesecduleScreen({super.key, required this.id});
 
   @override
   State<TimesecduleScreen> createState() => _TimesecduleScreenState();
@@ -43,6 +46,9 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
       ).fetchScheduleData();
     });
   }
+
+  int _unitPrice(dynamic p) =>
+      p is num ? p.toInt() : int.tryParse(p?.toString() ?? '') ?? 0;
 
   @override
   void dispose() {
@@ -75,55 +81,76 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
         .toList();
   }
 
-  Map<String, dynamic> _cartSummary(BuildContext context) {
-    final cart = Provider.of<CartProvider>(context, listen: false);
-
-    List<dynamic> items;
-    try {
-      items = (cart as dynamic).cartItems as List<dynamic>;
-    } catch (_) {
-      try {
-        items = (cart as dynamic).items as List<dynamic>;
-      } catch (_) {
-        items = const [];
-      }
-    }
-
-    int total = 0;
-    final lines = <_Line>[];
-
-    for (final it in items) {
-      dynamic title;
-      dynamic totalPrice;
-
-      if (it is Map) {
-        title = it['package']?['title'] ?? it['title'];
-        totalPrice = it['totalPrice'] ?? it['price'] ?? 0;
-      } else {
-        try {
-          title = (it as dynamic).package?.title ?? (it as dynamic).title;
-        } catch (_) {}
-        try {
-          totalPrice = (it as dynamic).totalPrice ?? (it as dynamic).price ?? 0;
-        } catch (_) {}
-      }
-
-      final name = (title?.toString() ?? 'Selected service').trim();
-      final amt = int.tryParse('${totalPrice ?? 0}') ?? 0;
-      if (amt > 0) {
-        total += amt;
-      }
-      lines.add(_Line(name: name, qty: 1, unit: amt, total: amt));
-    }
-
-    return {'total': total, 'lines': lines};
-  }
-
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context, designSize: const Size(375, 812));
-    return Consumer<TimeScheduleViewProvider>(
-      builder: (context, provider, _) {
+
+    return Consumer2<TimeScheduleViewProvider, HomescreenviewProvider>(
+      builder: (context, provider, homeprovider, _) {
+        Recentworkmodel? item;
+        try {
+          item = homeprovider.recentworkmodel.firstWhere(
+            (e) => e.id == widget.id,
+            orElse: () => throw Exception('Item not found'),
+          );
+        } catch (e) {
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'Item not found',
+                style: GoogleFonts.poppins(
+                  color: Appcolor.blackcolor,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }
+
+        final rawOptions = (item as dynamic).selectedoptoins ?? [];
+
+        final List<Map<String, dynamic>> lines =
+            (rawOptions as List)
+                .map((o) {
+                  final id = (o as dynamic).id;
+                  final q = ((homeprovider as dynamic).getQty(id) as int?) ?? 0;
+                  if (q <= 0) return null;
+
+                  final unit = _unitPrice((o as dynamic).price);
+                  final name =
+                      ((o as dynamic).placename?.toString() ?? 'Option').trim();
+
+                  return {
+                    'name': name,
+                    'qty': q,
+                    'unit': unit,
+                    'total': unit * q,
+                  };
+                })
+                .whereType<Map<String, dynamic>>()
+                .toList();
+
+        if (lines.isEmpty) {
+          return Scaffold(
+            body: Center(
+              child: Text(
+                'No selected options found',
+                style: GoogleFonts.poppins(
+                  color: Appcolor.blackcolor,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        }
+
+        final int grandTotal = lines.fold<int>(
+          0,
+          (sum, e) => sum + ((e['total'] as num?)?.toInt() ?? 0),
+        );
+
         final selectedIndex = _dates.indexWhere(
           (d) =>
               d.year == provider.selectedDate.year &&
@@ -132,15 +159,15 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
         );
         final effectiveSelectedIndex = selectedIndex == -1 ? 0 : selectedIndex;
 
-        final summary = _cartSummary(context);
-        final int grandTotal = summary['total'] as int? ?? 0;
-        final List<_Line> lines = (summary['lines'] as List<_Line>);
+        // final summary = _cartSummary(context);
 
         final morning = _deriveMorningSlots(provider);
         final afternoon = _deriveAfternoonSlots(provider);
 
         return Scaffold(
           appBar: AppBar(
+            surfaceTintColor: Appcolor.whitecolor,
+
             backgroundColor: Appcolor.whitecolor,
             centerTitle: true,
             automaticallyImplyLeading: false,
@@ -160,10 +187,10 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
             ),
             title: Text(
               "Book Your Slot",
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 color: Appcolor.blackcolor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -188,19 +215,20 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "₹${grandTotal.toStringAsFixed(0)}",
-                        style: TextStyle(
+                        "₹$grandTotal",
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 20,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         "inc. all taxes",
-                        style: TextStyle(
-                          color: Appcolor.blackcolor.withOpacity(0.6),
-                          fontSize: 12,
+                        style: GoogleFonts.poppins(
+                          color: Appcolor.blackcolor,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -223,29 +251,14 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
                         provider.selectedTimeSlot == null
                             ? null
                             : () {
-                              openLocationSheet(context, provider);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Booked: ${DateFormat('MMM d, yyyy').format(provider.selectedDate)} at ${provider.selectedTimeSlot}",
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  backgroundColor: Appcolor.primarycolor,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                              );
+                              openLocationSheet(context, provider, item!);
                             },
-                    child: const Text(
+                    child: Text(
                       "Confirm Booking",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
+                      style: GoogleFonts.poppins(
+                        color: Appcolor.whitecolor,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -259,7 +272,6 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (lines.isNotEmpty) ...[
-                  // Selected Work (like pest control)
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -270,12 +282,12 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
                           color: Appcolor.blackcolor.withOpacity(0.15),
                         ),
                     itemBuilder: (context, index) {
-                      final l = lines[index];
+                      final Map<String, dynamic> l = lines[index];
                       return _SelectedLineTile(
-                        name: l.name,
-                        qty: l.qty,
-                        unit: l.unit,
-                        total: l.total,
+                        name: (l['name'] as String?)?.trim() ?? '',
+                        qty: (l['qty'] as num?)?.toInt() ?? 0,
+                        unit: (l['unit'] as num?)?.toInt() ?? 0,
+                        total: (l['total'] as num?)?.toInt() ?? 0,
                       );
                     },
                   ),
@@ -288,15 +300,15 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
                   ),
                   child: Text(
                     "Appointment",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Appcolor.blackcolor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
+                SizedBox(height: 5.h),
 
-                // Date pills (7 days) like pest control
                 SizedBox(
                   height: 92,
                   child: ListView.separated(
@@ -321,8 +333,8 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
 
                 const SizedBox(height: 16),
 
-                // Morning slots
                 const _SectionHeader(title: "Morning Slots"),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -349,8 +361,8 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
                   ),
                 ),
 
-                // Afternoon slots
-                const _SectionHeader(title: "Afternoon"),
+                const _SectionHeader(title: "Afternoon Slots"),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -396,100 +408,323 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
         false;
   }
 
-  void openLocationSheet(
-    BuildContext context,
-    TimeScheduleViewProvider provider,
-  ) {
-    FlexibleBottomSheets.show(
+  Future<void> showConfirmationSheet({
+    required BuildContext context,
+    required Recentworkmodel item,
+  }) async {
+    final parentNavigator = Navigator.of(context);
+
+    final schedule = context.read<TimeScheduleViewProvider>();
+    final selectedDate = schedule.selectedDate;
+    final timeLabel = schedule.selectedTimeSlot ?? '';
+    final formattedDate = DateFormat('EEE d MMM yyyy').format(selectedDate);
+
+    final items = item.selectedoptoins.firstWhere((e) => e.id == widget.id);
+
+    String placeLine;
+    if ((items.placename ?? '').trim().isNotEmpty ||
+        (items.area ?? '').trim().isNotEmpty) {
+      final p = (items.placename ?? '').trim();
+      final a = (items.area ?? '').trim();
+      placeLine = [p, a].where((s) => s.isNotEmpty).join(', ');
+    } else {
+      placeLine = '1534 Single Street, USA';
+    }
+    final workline =
+        (item.title ?? '').trim().isNotEmpty ? item.title! : 'Pest Control';
+
+    final bool? goNext = await showModalBottomSheet<bool>(
       context: context,
-      initialHeight: 0.5,
-      minHeight: 0.0,
-      maxHeight: 0.9,
-      headerHeight: 56,
-      headerBuilder:
-          (context, offset) => Container(
-            color: Appcolor.primarycolor,
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      useRootNavigator: true,
+      backgroundColor: Colors.white,
+      isScrollControlled: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Flexible(
-                  child: Text(
-                    'Set Location',
-                    style: TextStyle(
-                      color: Appcolor.whitecolor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, color: Colors.white, size: 24),
+                const SizedBox(height: 4),
+                Text(
+                  'Confirmation',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Appcolor.blackcolor,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  placeLine,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Appcolor.blackcolor,
+                  ),
+                ),
+                Text(
+                  workline,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Appcolor.blackcolor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'at $timeLabel, $formattedDate',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Appcolor.blackcolor.withOpacity(0.7),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                    ResumeButton(
+                      buttonText: "continue",
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop(true);
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed:
+                              () => Navigator.of(sheetContext).pop(false),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: BorderSide(color: Appcolor.blackcolor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-      bodyBuilder: (context, offset) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.dg, horizontal: 20.sp),
+        );
+      },
+    );
+
+    if (goNext == true && mounted) {
+      parentNavigator.pushNamed(
+        RouteName.confirmbookingscreen,
+        arguments: widget.id,
+      );
+    }
+  }
+
+  void openLocationSheet(
+    BuildContext context,
+    TimeScheduleViewProvider provider,
+    Recentworkmodel item,
+  ) {
+    void _showAddAddressSheet() {
+      final _addressController = TextEditingController();
+      final _houseNoController = TextEditingController();
+      final _landmarkController = TextEditingController();
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        builder: (ctx) {
+          return FractionallySizedBox(
+            heightFactor: 0.7,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 20.w,
+                  right: 20.w,
+                  bottom: MediaQuery.of(ctx).viewInsets.bottom + 20.h,
+                  top: 20.h,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(ctx),
+                            child: const Icon(Icons.close, size: 24),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        "Add your Address",
+                        style: GoogleFonts.poppins(
+                          color: Appcolor.blackcolor,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+
+                      InputForm(
+                        title: "Address",
+                        controller: _addressController,
+                      ),
+                      SizedBox(height: 14.h),
+                      InputForm(
+                        title: "House/Flat No",
+                        controller: _houseNoController,
+                      ),
+                      SizedBox(height: 14.h),
+                      InputForm(
+                        title: "Landmark",
+                        controller: _landmarkController,
+                      ),
+                      SizedBox(height: 20.h),
+
+                      Custombutton(
+                        buttonText: "Continue",
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          Future.delayed(const Duration(milliseconds: 120), () {
+                            showConfirmationSheet(context: context, item: item);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          top: false,
           child: Consumer<LocationProvider>(
             builder: (context, locationprovider, child) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // SearchTextField(controller: _searchController),
-                  SizedBox(height: 20.sp),
-                  // Row(
-                  //   children: [
-                  //     IconButton(
-                  //       onPressed: () {},
-                  //       icon: Image.asset(
-                  //         "assets/icons/pin.png",
-                  //         height: 30,
-                  //         width: 30,
-                  //       ),
-                  //     ),
-                  //     SizedBox(width: 5.sp),
-                  //     GestureDetector(
-                  //       onTap: () async {
-                  //         // await locationprovider.getposition(context);
-                  //         // if (locationprovider.address != null) {
-                  //         //   _addressController.text = locationprovider.address!;
-                  //         // }
-                  //       },
-                  //       child: Text(
-                  //         "Use your current location",
-                  //         style: TextStyle(
-                  //           fontSize: 16.sp,
-                  //           fontWeight: FontWeight.bold,
-                  //           color: Appcolor.blackcolor,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  SizedBox(height: 20.sp),
-                  InputForm(
-                    // readonly: true,
-                    title: "Address",
-                    controller: _addressController,
-                  ),
-                  SizedBox(height: 16.sp),
-                  InputForm(
-                    title: "House/FlatNo",
-                    controller: _houseNoController,
-                  ),
-                  SizedBox(height: 16.sp),
-                  InputForm(title: "Landmark", controller: _landmarkController),
-                  SizedBox(height: 16.sp),
-                  Custombutton(
-                    buttonText: "continue",
-                    onPressed: () {
-                      Navigator.pushNamed(context, RouteName.mencartscreen);
-                    },
-                  ),
-                ],
+              final statusText =
+                  locationprovider.isLoading
+                      ? "Fetching your location…"
+                      : (locationprovider.address ?? "Location not available");
+
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Saved Address",
+                      style: GoogleFonts.poppins(
+                        color: Appcolor.blackcolor,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 15.h),
+
+                    GestureDetector(
+                      onTap: _showAddAddressSheet,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, color: Appcolor.blackcolor, size: 18),
+                          SizedBox(width: 6.w),
+                          Text(
+                            "Add another address",
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 15.h),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Appcolor.blackcolor,
+                          size: 20,
+                        ),
+                        SizedBox(width: 6.w),
+                        Expanded(
+                          child: Text(
+                            statusText,
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    ResumeButton(
+                      buttonText: "Proceed",
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(milliseconds: 120), () {
+                          showConfirmationSheet(context: context, item: item);
+                        });
+                      },
+                    ),
+                    SizedBox(height: 10.h),
+                  ],
+                ),
               );
             },
           ),
@@ -498,6 +733,75 @@ class _TimesecduleScreenState extends State<TimesecduleScreen> {
     );
   }
 }
+
+// FlexibleBottomSheets.show(
+//   context: context,
+//   initialHeight: 0.5,
+//   minHeight: 0.0,
+//   maxHeight: 0.9,
+//   headerHeight: 56,
+//   headerBuilder:
+//       (context, offset) => Container(
+//         color: Appcolor.primarycolor,
+//         padding: const EdgeInsets.all(16.0),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//           children: [
+//             const Flexible(
+//               child: Text(
+//                 'Set Location',
+//                 style: TextStyle(
+//                   color: Appcolor.whitecolor,
+//                   fontSize: 15,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//             ),
+//             GestureDetector(
+//               onTap: () => Navigator.pop(context),
+//               child: const Icon(Icons.close, color: Colors.white, size: 24),
+//             ),
+//           ],
+//         ),
+//       ),
+//   bodyBuilder: (context, offset) {
+//     return Padding(
+//       // keeping your ScreenUtil usage as-is
+//       padding: EdgeInsets.symmetric(vertical: 20.dg, horizontal: 20.sp),
+//       child: Consumer<LocationProvider>(
+//         builder: (context, locationprovider, child) {
+//           return Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               SizedBox(height: 20.sp),
+//               InputForm(title: "Address", controller: _addressController),
+//               SizedBox(height: 16.sp),
+//               InputForm(
+//                 title: "House/FlatNo",
+//                 controller: _houseNoController,
+//               ),
+//               SizedBox(height: 16.sp),
+//               InputForm(title: "Landmark", controller: _landmarkController),
+//               SizedBox(height: 16.sp),
+//               Custombutton(
+//                 buttonText: "continue",
+//                 onPressed: () {
+//                   Navigator.pop(context);
+//                   Future.delayed(const Duration(milliseconds: 120), () {
+//                     showConfirmationSheet(
+//                       context: this.context,
+//                       item: item,
+//                     );
+//                   });
+//                 },
+//               ),
+//             ],
+//           );
+//         },
+//       ),
+//     );
+//   },
+// );
 
 class _Line {
   final String name;
@@ -512,7 +816,6 @@ class _Line {
   });
 }
 
-// ===== Reusable UI widgets (mirroring Pestcontrol look) =====
 class _SelectedLineTile extends StatelessWidget {
   final String name;
   final int qty;
@@ -567,48 +870,50 @@ class _SelectedLineTile extends StatelessWidget {
                             name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14.sp,
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ),
                       SizedBox(width: 8.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(999.r),
-                          border: Border.all(
-                            color: Colors.black.withOpacity(0.08),
-                          ),
-                        ),
-                        child: Text(
-                          'x1', // quantity is 1 for package
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11.sp,
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: 8.w,
+                      //     vertical: 4.h,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.black.withOpacity(0.06),
+                      //     borderRadius: BorderRadius.circular(999.r),
+                      //     border: Border.all(
+                      //       color: Colors.black.withOpacity(0.08),
+                      //     ),
+                      //   ),
+                      //   child: Text(
+                      //     'x$qty',
+                      //     style: GoogleFonts.poppins(
+                      //       color: Appcolor.blackcolor,
+                      //       fontSize: 12.sp,
+                      //       fontWeight: FontWeight.w500,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   SizedBox(height: 6.h),
                   RichText(
                     text: TextSpan(
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Colors.black.withOpacity(0.75),
-                        fontWeight: FontWeight.w600,
+                      style: GoogleFonts.poppins(
+                        color: Appcolor.blackcolor,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                       children: [
                         TextSpan(text: '₹$unit'),
                         const TextSpan(text: ' × '),
-                        const TextSpan(text: '1'),
+                        TextSpan(text: '$qty'),
                         const TextSpan(text: ' = '),
                         TextSpan(
                           text: '₹$total',
@@ -633,16 +938,16 @@ class _SelectedLineTile extends StatelessWidget {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.07),
                     blurRadius: 8,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Text(
                 '₹$total',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13.sp,
+                style: GoogleFonts.poppins(
+                  color: Appcolor.whitecolor,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -668,10 +973,8 @@ class _DatePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color border =
-        selected
-            ? Appcolor.primarycolor
-            : Theme.of(context).primaryColor.withOpacity(0.35);
-    final Color fill = selected ? Appcolor.whitecolor : Colors.white;
+        selected ? Appcolor.primarycolor : Theme.of(context).disabledColor;
+    final Color fill = selected ? Appcolor.whitecolor : Appcolor.whitecolor;
     final Color text = selected ? Appcolor.blackcolor : Colors.black87;
 
     return GestureDetector(
@@ -687,7 +990,7 @@ class _DatePill extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -696,8 +999,8 @@ class _DatePill extends StatelessWidget {
           children: [
             Text(
               labelTop,
-              style: TextStyle(
-                fontSize: 12,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: text,
               ),
@@ -705,9 +1008,9 @@ class _DatePill extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               labelBottom,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
                 color: text,
               ),
             ),
@@ -729,10 +1032,10 @@ class _SectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: Appcolor.blackcolor,
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
             ),
           ),
         ],
@@ -760,7 +1063,7 @@ class _TimeChip extends StatelessWidget {
             ? Colors.grey
             : (selected
                 ? Appcolor.primarycolor
-                : Theme.of(context).primaryColor.withOpacity(0.35));
+                : Theme.of(context).disabledColor.withOpacity(0.35));
     final Color fill =
         disabled
             ? Colors.grey.shade300
@@ -783,13 +1086,13 @@ class _TimeChip extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.02),
               blurRadius: 6,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
             color: text,
             fontSize: 13,

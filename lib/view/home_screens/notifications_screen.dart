@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -17,11 +19,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         centerTitle: true,
         title: Text(
           "Notification Screen ",
-          style: TextStyle(
-            color: Appcolor.blackcolor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style:  GoogleFonts.poppins(
+                        color: Appcolor.blackcolor,
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
         ),
       ),
     );

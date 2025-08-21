@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 import 'package:mychoice/viewmodel/control_pest_control_view/contro_pest_provider.dart';
@@ -155,25 +156,25 @@ class Controlpestcontrol extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                      style:  GoogleFonts.poppins(
                         color: Appcolor.blackcolor,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       subtitle,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
+                      style:  GoogleFonts.poppins(
                         color: Appcolor.blackcolor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ],
                 ),
               ),
               CircleAvatar(
-                radius: 20,
+                radius: 18,
                 backgroundColor: Appcolor.blackcolor.withOpacity(0.1),
                 child: Icon(
                   Icons.arrow_forward_ios,

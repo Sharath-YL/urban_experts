@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class RouteName {
   static const String homescreen = "HomeScreen";
   static const String login = "Loginscreen";
-  static const String description = "Descriptionscreen";
+  static const String commonservicescreen = "Commonservicesscreen";
   static const String mencartscreen = "MenCartScreen";
   static const String viewordersetailsScreen = "Vieworderdertailsscreen";
   static const String bookingscreen = "BookingScreens";
@@ -18,5 +18,10 @@ class RouteName {
   static const String cleaningpestcontrodescriptionscreen =
       "CleaningDescriptionScreen";
   static const String pestcontroltimeselectionselection = "PestcontrolTimeselection"; 
-  static const String pestcontrolconfirmationscreen="PestcontrolConfirmationScreen";
+  static const String pestcontrolconfirmationscreen="PestcontrolConfirmationScreen"; 
+  static const String commonservicesdescriptionscreen ="CommonservicesDecriptionscreen"; 
+  static const String privacypolicyscreen="PrivacyPolicyscreen"; 
+   static const String termsofservices="TermsConditionsScreen";  
+  static const String editprofilescreen="EditprofileScreen"; 
+  static const String profilescreen="ProfileScreen";
 }

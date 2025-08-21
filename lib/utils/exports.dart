@@ -10,7 +10,7 @@ import 'package:bottom_sheet/bottom_sheet.dart';
 
 import 'package:mychoice/view/auth_screens/loginscreen.dart';
 import 'package:mychoice/view/cart/Mencartscreen.dart';
-import 'package:mychoice/view/descriptions/descriptionscreen.dart';
+import 'package:mychoice/view/descriptions/commonservicesscreen.dart';
 import 'package:mychoice/view/home_screens/home_screen.dart';
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';

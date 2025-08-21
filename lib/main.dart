@@ -21,7 +21,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-  final TextTheme textTheme = GoogleFonts.montserratTextTheme();
+  final TextTheme textTheme = GoogleFonts.poppinsTextTheme();
   final materiltheme = MaterialTheme(TextTheme());
   @override
   Widget build(BuildContext context) {

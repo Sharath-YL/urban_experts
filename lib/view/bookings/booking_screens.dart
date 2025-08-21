@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_segment/flutter_advanced_segment.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/data/models/bookingmodel.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/utils/routes/routes.dart';
@@ -39,12 +40,12 @@ class _BookingScreensState extends State<BookingScreens> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
+        title: Text(
           'My Bookings',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Appcolor.blackcolor,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
@@ -62,7 +63,7 @@ class _BookingScreensState extends State<BookingScreens> {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
+                      horizontal: 5.w,
                       vertical: 12.h,
                     ),
                     child: AdvancedSegment(
@@ -70,7 +71,7 @@ class _BookingScreensState extends State<BookingScreens> {
                       controller: _selectedSegment,
                       itemPadding: EdgeInsets.symmetric(
                         vertical: 10,
-                        horizontal: 30,
+                        horizontal: 18,
                       ),
                       segments: const {
                         'Pending': 'Pending',
@@ -79,14 +80,19 @@ class _BookingScreensState extends State<BookingScreens> {
                         'Cancelled': 'Cancelled',
                       },
                       backgroundColor: Appcolor.primarycolor.withOpacity(0.1),
-                      activeStyle: TextStyle(
+                      activeStyle: GoogleFonts.poppins(
                         color: Appcolor.whitecolor,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
                       ),
-                      inactiveStyle: TextStyle(color: Appcolor.blackcolor),
+                      inactiveStyle: GoogleFonts.poppins(
+                        color: Appcolor.blackcolor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
                       borderRadius: BorderRadius.circular(8.r),
                       sliderColor: Appcolor.primarycolor,
-                      sliderOffset: 1,
+                      sliderOffset: 0,
                     ),
                   ),
                   ValueListenableBuilder<String>(
@@ -118,7 +124,22 @@ class _BookingScreensState extends State<BookingScreens> {
     BookingProvider provider,
   ) {
     if (bookings.isEmpty) {
-      return Center(child: Text('No $status bookings.'));
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 150.h),
+          // Image.asset("assets/icons/pending (1).png", height: 100, width: 100),
+          // SizedBox(height: 30.h),
+          Text(
+            "No $status bookings",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      );
     }
 
     return ListView.builder(
@@ -159,10 +180,10 @@ class _BookingScreensState extends State<BookingScreens> {
                     Expanded(
                       child: Text(
                         '#${booking.id}',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           fontSize: 14.sp,
-                          color: Colors.blue,
+                          color: Appcolor.primarycolor,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -185,7 +206,7 @@ class _BookingScreensState extends State<BookingScreens> {
                         ),
                         child: Text(
                           booking.status,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             color:
@@ -207,7 +228,7 @@ class _BookingScreensState extends State<BookingScreens> {
                 SizedBox(height: 6.h),
                 Text(
                   booking.title,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -216,10 +237,10 @@ class _BookingScreensState extends State<BookingScreens> {
                   SizedBox(height: 4.h),
                   Text(
                     'Options:',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w500,
-                      color: Appcolor.greycolor,
+                      color: Appcolor.blackcolor,
                     ),
                   ),
                   ...booking.selectedOptions.map(
@@ -236,7 +257,7 @@ class _BookingScreensState extends State<BookingScreens> {
                           Expanded(
                             child: Text(
                               option['title'],
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 14.sp,
                                 color: Appcolor.blackcolor,
                               ),
@@ -244,7 +265,7 @@ class _BookingScreensState extends State<BookingScreens> {
                           ),
                           Text(
                             '₹${option['price']}',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: 14.sp,
                               color: Appcolor.blackcolor,
                             ),
@@ -261,7 +282,10 @@ class _BookingScreensState extends State<BookingScreens> {
                     Expanded(
                       child: Text(
                         booking.dateTime,
-                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                        style: GoogleFonts.poppins(
+                          fontSize: 13.sp,
+                          color: Colors.grey,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
@@ -269,7 +293,7 @@ class _BookingScreensState extends State<BookingScreens> {
                     ),
                     Text(
                       '₹ ${booking.price}',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 15.sp,
                       ),
@@ -279,7 +303,10 @@ class _BookingScreensState extends State<BookingScreens> {
                 SizedBox(height: 4.h),
                 Text(
                   booking.location,
-                  style: TextStyle(fontSize: 13.sp, color: Colors.grey),
+                  style: GoogleFonts.poppins(
+                    fontSize: 13.sp,
+                    color: Colors.grey,
+                  ),
                 ),
                 SizedBox(height: 8.h),
                 Divider(thickness: 1, color: Appcolor.greycolor),
@@ -295,7 +322,7 @@ class _BookingScreensState extends State<BookingScreens> {
                               padding: EdgeInsets.only(right: 10.w),
                               child: Text(
                                 booking.providerName,
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   color: Appcolor.blackcolor,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -304,7 +331,7 @@ class _BookingScreensState extends State<BookingScreens> {
                           SizedBox(height: 5.h),
                           Text(
                             "⭐${booking.rating.toStringAsFixed(1)} Ratings",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.blackcolor,
                               fontWeight: FontWeight.bold,
                             ),
@@ -327,9 +354,9 @@ class _BookingScreensState extends State<BookingScreens> {
                             vertical: 4.h,
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Cancel',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Appcolor.whitecolor,
                             fontSize: 12,
                           ),

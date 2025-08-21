@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 import 'package:mychoice/viewmodel/bookingscreenmodels/bookingscreen_provider.dart';
@@ -33,12 +34,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
             AppBar(
               automaticallyImplyLeading: false,
               centerTitle: true,
-              title: const Text(
+              title: Text(
                 "History",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   color: Appcolor.blackcolor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -67,7 +68,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
 
     if (completedBookings.isEmpty) {
-      return const Center(child: Text('No completed bookings.'));
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 150.h),
+          // Image.asset("assets/icons/history.png", height: 100, width: 100),
+          // SizedBox(height: 30.h),
+          Text(
+            "No History Found",
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      );
     }
 
     return ListView.builder(

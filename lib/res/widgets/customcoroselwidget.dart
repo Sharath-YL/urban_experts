@@ -14,7 +14,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
 
   final List<String> imgList = [
     'https://tse1.mm.bing.net/th/id/OIP.x6R1CaquUXRHIwNCLsSF-AHaE7?pid=Api&P=0&h=180',
-    'https://www.nobroker.in/blog/wp-content/uploads/2022/09/Cleaning-Service-in-BTM-Layout-1.jpg',
+    'https://tse1.mm.bing.net/th/id/OIP.x6R1CaquUXRHIwNCLsSF-AHaE7?pid=Api&P=0&h=180',
     'https://tse3.mm.bing.net/th/id/OIP.KIZyFbNVIlvn41MHrMC1bgHaE8?pid=Api&P=0&h=180',
   ];
 
@@ -80,7 +80,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
           ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(15.0)),
             child: Image.network(
-              'https://www.nobroker.in/blog/wp-content/uploads/2022/09/Cleaning-Service-in-BTM-Layout-1.jpg',
+              'https://tse2.mm.bing.net/th/id/OIP.R2wA8hy63KfFMxQaVKkE4QHaEi?pid=Api&P=0&h=180',
               fit: BoxFit.cover,
               width: double.infinity,
             ),

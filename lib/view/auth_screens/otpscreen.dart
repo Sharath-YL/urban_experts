@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/custombuttons.dart';
 import 'package:mychoice/utils/routes/routes.dart';
@@ -15,7 +16,7 @@ class Otpscreen extends StatefulWidget {
 class _OtpscreenState extends State<Otpscreen> {
   @override
   Widget build(BuildContext context) {
-     ScreenUtil.init(context, designSize: const Size(375, 812));
+    ScreenUtil.init(context, designSize: const Size(375, 812));
     return Scaffold(
       body: Stack(
         children: [
@@ -50,10 +51,10 @@ class _OtpscreenState extends State<Otpscreen> {
                       SizedBox(width: 15.w),
                       Text(
                         'Verify',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Appcolor.whitecolor,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -77,18 +78,19 @@ class _OtpscreenState extends State<Otpscreen> {
                         children: [
                           Text(
                             "Phone Number",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.blackcolor,
-                              fontWeight: FontWeight.bold,
                               fontSize: 18.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           SizedBox(height: 20.h),
                           Text(
                             "Enter your Phone Number and get otp code from Urban Experts ",
-                            style: TextStyle(
-                              color: Appcolor.blackcolor.withOpacity(0.7),
-                              fontWeight: FontWeight.bold,
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
                           SizedBox(height: 30.h),
@@ -107,7 +109,7 @@ class _OtpscreenState extends State<Otpscreen> {
                             onPressed: () {
                               Navigator.pushNamed(
                                 context,
-                                RouteName.locationscreen, 
+                                RouteName.locationscreen,
                               );
                             },
                           ),

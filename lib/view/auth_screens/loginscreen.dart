@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mychoice/res/components/customtextbutton.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:flutter/services.dart';
 import 'package:mychoice/res/widgets/custombuttons.dart';
@@ -18,6 +20,8 @@ class _LoginscreenState extends State<Loginscreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
   bool _agreeToTerms = false;
+
+  final _phonefocus = FocusNode();
 
   @override
   void dispose() {
@@ -61,10 +65,10 @@ class _LoginscreenState extends State<Loginscreen> {
                       SizedBox(width: 10.w),
                       Text(
                         'Urban Experts',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Appcolor.whitecolor,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 25.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -89,57 +93,34 @@ class _LoginscreenState extends State<Loginscreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Login",
-                              style: TextStyle(
+                              "Login ",
+                              style: GoogleFonts.poppins(
                                 color: Appcolor.blackcolor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.sp,
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                             SizedBox(height: 20.h),
                             Text(
                               'Mobile Number',
-                              style: TextStyle(color: Appcolor.blackcolor),
+                              style: TextStyle(
+                                color: Appcolor.blackcolor,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             SizedBox(height: 20.h),
-                            TextFormField(
+
+                            ResumeTextfield(
+                              textInputAction: TextInputAction.next,
+                              label: "Mobile Number",
                               controller: _phoneController,
-                              keyboardType: TextInputType.phone,
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(10),
                               ],
-                              decoration: InputDecoration(
-                                prefixIcon: CountryPrefix(),
-                                hintText: "Enter your phone number",
-                                hintStyle: TextStyle(
-                                  fontSize: 12,
-                                  color: Appcolor.blackcolor.withOpacity(0.5),
-                                ),
-                                suffixIcon: const Icon(
-                                  Icons.phone,
-                                  color: Appcolor.blackcolor,
-                                  size: 18,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Appcolor.blackcolor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: Appcolor.blackcolor,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                labelText: "Mobile Number",
-                                labelStyle: TextStyle(
-                                  color: Appcolor.blackcolor,
-                                ),
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.auto,
-                              ),
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: CountryPrefix(),
+                              focusNode: _phonefocus,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your phone number';
@@ -165,8 +146,10 @@ class _LoginscreenState extends State<Loginscreen> {
                                 Expanded(
                                   child: Text(
                                     'I agree to the terms and conditions',
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       color: Appcolor.blackcolor,
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -190,22 +173,32 @@ class _LoginscreenState extends State<Loginscreen> {
                                 }
                               },
                             ),
-                            40.verticalSpace,
+                            30.verticalSpace,
 
                             Center(
-                              child: TextButton(
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    RouteName.signupscreen,
-                                  );
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(context, RouteName.signupscreen);
                                 },
-                                child: Text(
-                                  'Sign up',
-                                  style: TextStyle(
-                                    color: Appcolor.primarycolor,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.bold,
+                                child: Container(
+                                  height: 55.h,
+                                  width: 360.sp,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Appcolor.blackcolor.withOpacity(
+                                        0.5,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "SignUp",
+                                      style: GoogleFonts.poppins(
+                                        color: Appcolor.blackcolor,
+                                        fontSize: 18.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

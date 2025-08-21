@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // <-- for inputFormatters
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/components/customtextbutton.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/custombuttons.dart';
 import 'package:mychoice/utils/routes/routes.dart';
+import 'package:mychoice/utils/toastmessages.dart';
 
 class Signupscreen extends StatefulWidget {
   const Signupscreen({super.key});
@@ -17,13 +20,40 @@ class _SignupscreenState extends State<Signupscreen> {
   final _phoneCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
 
+  final _emailFocus = FocusNode();
+  final _phoneFocus = FocusNode();
+  final _passFocus = FocusNode();
+
   bool _obscurePass = true;
+
+  final _emailReg = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$');
+
+  bool _isValidEmail(String v) => _emailReg.hasMatch(v.trim());
+  bool _isValidPhone(String v) => v.trim().length == 10;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // _emailFocus.addListener(() => setState(() {}));
+  //   // _phoneFocus.addListener(() => setState(() {}));
+  //   // _passFocus.addListener(() => setState(() {}));
+  // }
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
+    _passCtrl.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
+    _passFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final black = (Appcolor.blackcolor) ?? Colors.black;
     final white = (Appcolor.whitecolor) ?? Colors.white;
-    final blue = (Appcolor.primarycolor) ?? const Color(0xFF1677FF);
 
     return Scaffold(
       backgroundColor: black,
@@ -60,10 +90,10 @@ class _SignupscreenState extends State<Signupscreen> {
                       10.horizontalSpace,
                       Text(
                         'Urban Experts',
-                        style: TextStyle(
-                          color: white,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
+                        style: GoogleFonts.poppins(
+                          color: Appcolor.whitecolor,
+                          fontSize: 25.sp,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -88,92 +118,117 @@ class _SignupscreenState extends State<Signupscreen> {
                         children: [
                           Text(
                             'Sign up',
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black,
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           22.verticalSpace,
 
-                          Label('E-mail', black),
-                          10.verticalSpace,
-                          TextFormField(
+                          ResumeTextfield(
+                            label: "Email",
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: inputDecoration(
-                              hint: "abc@gmail.com",
-
-                              suffix: const Icon(
-                                Icons.email,
-                                size: 18,
-                                color: Appcolor.blackcolor,
-                              ),
+                            textInputAction: TextInputAction.next,
+                            prefixIcon: Icon(
+                              Icons.email,
+                              size: 15,
+                              color: Appcolor.blackcolor,
                             ),
+                            focusNode: _emailFocus,
                           ),
                           16.verticalSpace,
 
-                          Label('Mobile Number', black),
-                          10.verticalSpace,
-                          TextField(
+                          ResumeTextfield(
+                            textInputAction: TextInputAction.next,
+                            label: "Phone Number",
                             controller: _phoneCtrl,
-
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(10),
+                            ],
                             keyboardType: TextInputType.phone,
-                            decoration: inputDecoration(
-                              hint: '98762452221',
-                              prefix: CountryPrefix(),
-                              suffix: const Icon(
-                                Icons.phone,
-                                color: Appcolor.blackcolor,
-                                size: 18,
-                              ),
-                            ),
+                            prefixIcon: CountryPrefix(),
+                            focusNode: _phoneFocus,
                           ),
                           16.verticalSpace,
 
-                          Label('Password', black),
-                          10.verticalSpace,
-                          TextField(
-                            controller: _passCtrl,
+                          ResumeTextfield(
+                            textInputAction: TextInputAction.next,
                             obscureText: _obscurePass,
-                            decoration: inputDecoration(
-                              hint: '********',
-                              suffix: IconButton(
-                                icon: Icon(
-                                  _obscurePass
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                  color: Appcolor.blackcolor,
-                                  size: 18,
-                                ),
-                                onPressed:
-                                    () => setState(
-                                      () => _obscurePass = !_obscurePass,
-                                    ),
+                            label: "Password",
+                            controller: _passCtrl,
+                            keyboardType: TextInputType.visiblePassword,
+                            prefixIcon: IconButton(
+                              onPressed:
+                                  () => setState(
+                                    () => _obscurePass = !_obscurePass,
+                                  ),
+                              icon: Icon(
+                                _obscurePass
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                size: 18,
+                                color: Appcolor.blackcolor,
                               ),
+                              tooltip:
+                                  _obscurePass
+                                      ? 'Show password'
+                                      : 'Hide password',
                             ),
+                            focusNode: _passFocus,
                           ),
+
                           24.verticalSpace,
 
                           ResumeButton(
                             buttonText: "SignUp",
                             onPressed: () {
+                              final email = _emailCtrl.text.trim();
+                              final phone = _phoneCtrl.text.trim();
+                              if (!_isValidPhone(phone)) {
+                                Utils.flushbarErrorMessage(
+                                  "Please Enter 10 digits of phone Number",
+                                  context,
+                                );
+
+                                return;
+                              }
+                              if (!_isValidEmail(email)) {
+                                Utils.flushbarErrorMessage(
+                                  "Please enter a valid email address",
+                                  context,
+                                );
+                                return;
+                              }
                               Navigator.pushNamed(context, RouteName.OtpScreen);
                             },
                           ),
-                          10.verticalSpace,
+                          20.verticalSpace,
 
                           Center(
-                            child: TextButton(
-                              onPressed: () {
+                            child: GestureDetector(
+                              onTap: () {
                                 Navigator.pushNamed(context, RouteName.login);
                               },
-                              child: Text(
-                                'Log in',
-                                style: TextStyle(
-                                  color: Appcolor.primarycolor,
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
+                              child: Container(
+                                height: 55.h,
+                                width: 368.sp,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Appcolor.blackcolor.withOpacity(0.5),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Login",
+                                    style: GoogleFonts.poppins(
+                                      color: Appcolor.blackcolor,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -192,48 +247,6 @@ class _SignupscreenState extends State<Signupscreen> {
       ),
     );
   }
-
-  InputDecoration inputDecoration({
-    String? hint,
-    Widget? prefix,
-    Widget? suffix,
-  }) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: TextStyle(color: Appcolor.blackcolor),
-      prefixIcon: prefix,
-      suffixIcon: suffix,
-      contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
-      filled: true,
-      fillColor: const Color(0xFFF5F6F8),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: const Color(0xFFE6E8EB)),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: const Color(0xFFCBD2D9)),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-    );
-  }
-}
-
-class Label extends StatelessWidget {
-  const Label(this.text, this.color, {super.key});
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 12.sp,
-        color: color,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
 }
 
 class CountryPrefix extends StatelessWidget {
@@ -246,9 +259,10 @@ class CountryPrefix extends StatelessWidget {
         children: [
           Text(
             '+91',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.poppins(
               color: Appcolor.blackcolor,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500,
             ),
           ),
           6.horizontalSpace,

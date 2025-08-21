@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/customMostbookedservices.dart';
 import 'package:mychoice/res/widgets/custombestservices.dart';
@@ -56,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ScreenUtil.init(context, designSize: const Size(390, 850));
     final locationProvider = Provider.of<LocationProvider>(context);
     final homescreenProvider = Provider.of<HomescreenviewProvider>(context);
+
     return Scaffold(
       backgroundColor: Appcolor.whitecolor,
       appBar: _HomeAppBar(
@@ -92,22 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Row(
-                    //   children: [
-                    //     Text(
-                    //       "Services",
-                    //       style: TextStyle(
-                    //         color: Appcolor.blackcolor,
-                    //         fontWeight: FontWeight.bold,
-                    //         fontSize: 18.sp,
-                    //       ),
-                    //       overflow: TextOverflow.ellipsis,
-                    //     ),
-                    //     const Spacer(),
-                    //   ],
-                    // ),
-
-                    // SizedBox(height: 10.h),
                     Consumer<HomescreenviewProvider>(
                       builder: (context, snapshot, child) {
                         return GridView.builder(
@@ -127,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
-                                  RouteName.description,
+                                  RouteName.commonservicescreen,
                                   arguments: service.id,
                                 );
                               },
@@ -198,10 +184,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Text(
                                     service.title,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
+                                    style: GoogleFonts.poppins(
                                       color: Appcolor.blackcolor,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -219,10 +205,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: Text(
                             "Cleaning & Pest Control",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.blackcolor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -237,10 +223,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Text(
                             "View All",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.primarycolor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -253,10 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: Text(
                             "Our Best Services",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.blackcolor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -271,10 +257,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: Text(
                             "View All",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.primarycolor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -320,59 +306,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class TransformCarousel extends StatelessWidget {
-  const TransformCarousel({super.key});
+// class TransformCarousel extends StatelessWidget {
+//   const TransformCarousel({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    List<String> images = [
-      "assets/images/image1.jpg",
-      "assets/images/acimage.jpg",
-      "assets/images/plumber.webp",
-    ];
+//   @override
+//   Widget build(BuildContext context) {
+//     List<String> images = [
+//       "assets/images/image1.jpg",
+//       "assets/images/acimage.jpg",
+//       "assets/images/plumber.webp",
+//     ];
 
-    return ScrollConfiguration(
-      behavior: AppScrollBehavior(),
-      child: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 210,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
+//     return ScrollConfiguration(
+//       behavior: AppScrollBehavior(),
+//       child: CustomScrollView(
+//         slivers: [
+//           SliverToBoxAdapter(
+//             child: SizedBox(
+//               height: 210,
+//               child: ListView.builder(
+//                 scrollDirection: Axis.horizontal,
 
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Container(
-                      width: 300,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: AssetImage(images[index]),
-                          fit: BoxFit.cover,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//                 itemCount: images.length,
+//                 itemBuilder: (context, index) {
+//                   return Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+//                     child: Container(
+//                       width: 300,
+//                       height: 200,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(12),
+//                         image: DecorationImage(
+//                           image: AssetImage(images[index]),
+//                           fit: BoxFit.cover,
+//                         ),
+//                         boxShadow: [
+//                           BoxShadow(
+//                             color: Colors.black.withOpacity(0.2),
+//                             blurRadius: 8,
+//                             offset: const Offset(0, 4),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   );
+//                 },
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class AppScrollBehavior extends ScrollBehavior {
   @override
@@ -418,7 +404,6 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top row: title/address + bell
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -432,10 +417,10 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                             line1,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
+                            style: GoogleFonts.poppins(
                               color: Appcolor.whitecolor,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           SizedBox(height: 6.h),
@@ -443,9 +428,10 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                             line2,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.sp,
+                            style: GoogleFonts.poppins(
                               color: Appcolor.whitecolor,
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -464,10 +450,8 @@ class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
 
-              // Extra spacing between texts and search field
               SizedBox(height: 20.h),
 
-              // Search field
               Skeletonizer(
                 enabled: locationProvider.isLoading,
                 child: SearchTextField(controller: controller),

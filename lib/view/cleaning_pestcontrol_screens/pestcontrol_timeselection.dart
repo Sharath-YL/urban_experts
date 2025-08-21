@@ -192,108 +192,202 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
     TimeScheduleViewProvider provider,
     ControlPestModel item,
   ) {
-    FlexibleBottomSheets.show(
-      context: context,
-      initialHeight: 0.5,
-      minHeight: 0.0,
-      maxHeight: 0.9,
-      headerHeight: 56,
-      headerBuilder:
-          (context, offset) => Container(
-            color: Appcolor.primarycolor,
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Flexible(
-                  child: Text(
-                    'Set Location',
-                    style: TextStyle(
-                      color: Appcolor.whitecolor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+    {
+      void _showAddAddressSheet() {
+        final _addressController = TextEditingController();
+        final _houseNoController = TextEditingController();
+        final _landmarkController = TextEditingController();
+
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          builder: (ctx) {
+            return FractionallySizedBox(
+              heightFactor: 0.7,
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: 20.w,
+                    right: 20.w,
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom + 20.h,
+                    top: 20.h,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(ctx),
+                              child: const Icon(Icons.close, size: 24),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          "Add your Address",
+                          style: TextStyle(
+                            color: Appcolor.blackcolor,
+                            fontSize: 20.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+
+                        InputForm(
+                          title: "Address",
+                          controller: _addressController,
+                        ),
+                        SizedBox(height: 14.h),
+                        InputForm(
+                          title: "House/Flat No",
+                          controller: _houseNoController,
+                        ),
+                        SizedBox(height: 14.h),
+                        InputForm(
+                          title: "Landmark",
+                          controller: _landmarkController,
+                        ),
+                        SizedBox(height: 20.h),
+
+                        Custombutton(
+                          buttonText: "Continue",
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            Future.delayed(
+                              const Duration(milliseconds: 120),
+                              () {
+                                showConfirmationSheet(
+                                  context: context,
+                                  item: item,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: const Icon(Icons.close, color: Colors.white, size: 24),
-                ),
-              ],
-            ),
-          ),
-      bodyBuilder: (context, offset) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: 20.dg, horizontal: 20.sp),
-          child: Consumer<LocationProvider>(
-            builder: (context, locationprovider, child) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // SearchTextField(controller: _searchController),
-                  SizedBox(height: 20.sp),
-                  // Row(
-                  //   children: [
-                  //     IconButton(
-                  //       onPressed: () {},
-                  //       icon: Image.asset(
-                  //         "assets/icons/pin.png",
-                  //         height: 30,
-                  //         width: 30,
-                  //       ),
-                  //     ),
-                  //     SizedBox(width: 5.sp),
-                  //     GestureDetector(
-                  //       onTap: () async {
-                  //         await locationprovider.getposition(context);
-                  //         if (locationprovider.address != null) {
-                  //           _addressController.text = locationprovider.address!;
-                  //         }
-                  //       },
-                  //       child: Text(
-                  //         "Use your current location",
-                  //         style: TextStyle(
-                  //           fontSize: 16.sp,
-                  //           fontWeight: FontWeight.bold,
-                  //           color: Appcolor.blackcolor,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                  // SizedBox(height: 20.sp),
-                  InputForm(
-                    // readonly: true,
-                    title: "Address",
-                    controller: _addressController,
-                  ),
-                  SizedBox(height: 16.sp),
-                  InputForm(
-                    title: "House/FlatNo",
-                    controller: _houseNoController,
-                  ),
-                  SizedBox(height: 16.sp),
-                  InputForm(title: "Landmark", controller: _landmarkController),
-                  SizedBox(height: 16.sp),
-                  Custombutton(
-                    buttonText: "continue",
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Future.delayed(const Duration(milliseconds: 120), () {
-                        showConfirmationSheet(
-                          context: this.context,
-                          item: item,
-                        );
-                      });
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
-      },
-    );
+      }
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        builder: (context) {
+          return SafeArea(
+            top: false,
+            child: Consumer<LocationProvider>(
+              builder: (context, locationprovider, child) {
+                final statusText =
+                    locationprovider.isLoading
+                        ? "Fetching your location…"
+                        : (locationprovider.address ??
+                            "Location not available");
+
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 14.h,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Saved Address",
+                        style: TextStyle(
+                          color: Appcolor.blackcolor,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
+
+                      GestureDetector(
+                        onTap: _showAddAddressSheet,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: Appcolor.blackcolor,
+                              size: 18,
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              "Add another address",
+                              style: TextStyle(
+                                color: Appcolor.blackcolor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 15.h),
+
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Appcolor.blackcolor,
+                            size: 20,
+                          ),
+                          SizedBox(width: 6.w),
+                          Expanded(
+                            child: Text(
+                              statusText,
+                              style: TextStyle(
+                                color: Appcolor.blackcolor,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 20.h),
+
+                      ResumeButton(
+                        buttonText: "Proceed",
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Future.delayed(const Duration(milliseconds: 120), () {
+                            showConfirmationSheet(context: context, item: item);
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10.h),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override

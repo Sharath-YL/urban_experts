@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/view/home_screens/index_screens.dart';
@@ -471,7 +472,7 @@ class ErrorView extends StatelessWidget {
     return BaseCard(
       accentColor: Appcolor.errorcolor,
       icon: Icons.close,
-      title: "Oops! Something went\nterribly wrong.",
+      title: "Oops! Something went\n wrong.",
       subtitle: "Please try again or contact support.",
       buttonText: "Retry!",
       onPressed: onRetry,
@@ -531,17 +532,18 @@ class BaseCard extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.black54,
-              height: 1.3,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
             ),
           ),
           const SizedBox(height: 24),
@@ -552,7 +554,7 @@ class BaseCard extends StatelessWidget {
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
                 shape: const StadiumBorder(),
-                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
               ),
               child: Text(buttonText),
             ),
