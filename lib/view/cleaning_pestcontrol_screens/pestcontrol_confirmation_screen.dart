@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mychoice/res/constants/colors.dart';
+import 'package:mychoice/res/widgets/customtimewidgets.dart';
 import 'package:mychoice/view/home_screens/index_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:mychoice/data/models/control_pest_model.dart';
@@ -95,6 +96,7 @@ class _PestcontrolConfirmationScreenState
             selectedOptions.isNotEmpty
                 ? selectedOptions.fold(0, (sum, o) => sum + o.price)
                 : item.price;
+        print("the total prce is : $totalPrice");
 
         String placeLine;
         if ((item.placename ?? '').trim().isNotEmpty ||
@@ -245,9 +247,10 @@ class SuccessView extends StatelessWidget {
           Text(
             placeLine,
             textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
+            ),
           ),
           SizedBox(height: 10.h),
           Container(
@@ -273,16 +276,19 @@ class SuccessView extends StatelessWidget {
                   color: Appcolor.primarycolor,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Total Amount',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 Text(
                   rupee.format(totalPrice),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
                     fontSize: 18,
                   ),
                 ),
@@ -293,9 +299,9 @@ class SuccessView extends StatelessWidget {
           Text(
             "Service scheduled at $placeLine\non $timeLabel, $formattedDate",
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.black54,
-              height: 1.3,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
             ),
           ),
           const SizedBox(height: 12),
@@ -455,108 +461,6 @@ class SuccessView extends StatelessWidget {
                 textStyle: const TextStyle(fontWeight: FontWeight.w600),
               ),
               child: const Text('Back to Bookings'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ErrorView extends StatelessWidget {
-  final VoidCallback onRetry;
-  const ErrorView({required this.onRetry, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseCard(
-      accentColor: Appcolor.errorcolor,
-      icon: Icons.close,
-      title: "Oops! Something went\n wrong.",
-      subtitle: "Please try again or contact support.",
-      buttonText: "Retry!",
-      onPressed: onRetry,
-    );
-  }
-}
-
-class BaseCard extends StatelessWidget {
-  final Color accentColor;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String buttonText;
-  final VoidCallback onPressed;
-
-  const BaseCard({
-    required this.accentColor,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.buttonText,
-    required this.onPressed,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.08),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Container(
-                width: 110,
-                height: 110,
-                decoration: BoxDecoration(
-                  border: Border.all(color: accentColor, width: 3),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: accentColor, size: 56),
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: 180,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                shape: const StadiumBorder(),
-                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-              ),
-              child: Text(buttonText),
             ),
           ),
         ],

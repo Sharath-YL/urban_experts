@@ -136,26 +136,42 @@ class _CommonservicesDecriptionscreenState
                 if (lines.isNotEmpty) ...[
                   SizedBox(height: 12.h),
                   const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total',
-                        style: GoogleFonts.poppins(
-                          color: Appcolor.blackcolor,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Appcolor.blackcolor.withOpacity(1),
                       ),
-                      Text(
-                        '₹$grandTotal',
-                        style: GoogleFonts.poppins(
-                          color: Appcolor.blackcolor,
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14.w,
+                        vertical: 12.h,
                       ),
-                    ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total',
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            '₹$grandTotal',
+                            style: GoogleFonts.poppins(
+                              color: Appcolor.blackcolor,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20.h),
                   Padding(

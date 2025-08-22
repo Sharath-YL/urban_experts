@@ -70,10 +70,10 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
               children: [
                 Text(
                   'Selected Options (${provider.totalSelectedCount})',
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 GestureDetector(
@@ -109,9 +109,9 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
                           color: Appcolor.blackcolor.withOpacity(0.5),
                         ),
                         SizedBox(height: 8.h),
-                        const Text(
+                        Text(
                           'No options selected.',
-                          style: TextStyle(fontSize: 16),
+                          style: GoogleFonts.poppins(fontSize: 16),
                         ),
                       ],
                     ),
@@ -145,7 +145,7 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: Appcolor.blackcolor.withOpacity(1),
+                        color: Appcolor.blackcolor.withOpacity(0.7),
                       ),
                     ),
                     child: Padding(
@@ -243,7 +243,7 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
                 style: GoogleFonts.poppins(
                   color: Appcolor.blackcolor,
                   fontSize: 20.sp,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -256,7 +256,10 @@ class _CleaningDescriptionScreenState extends State<CleaningDescriptionScreen> {
                       backgroundColor: Appcolor.blackcolor,
                       label: Text(
                         'View Selected (${provider.totalSelectedCount})',
-                        style: const TextStyle(color: Colors.white),
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                       icon: const Icon(Icons.check_circle, color: Colors.white),
                     )
@@ -349,21 +352,11 @@ class PestControlDetailWidget extends StatelessWidget {
         onTap: ontap,
         behavior: HitTestBehavior.opaque,
         child: Container(
-          decoration: BoxDecoration(
-            // border: Border.all(
-            //   color:
-            //       isSelected == true
-            //           ? Appcolor.blackcolor.withOpacity(0.3)
-            //           : Appcolor.greycolor,
-            //   width: 2,
-            // ),
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
           padding: EdgeInsets.all(8.sp),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title + selected check
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -493,7 +486,7 @@ class PestControlDetailWidget extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontSize: 16.sp,
             color: Appcolor.blackcolor,
             fontWeight: FontWeight.bold,
@@ -514,13 +507,13 @@ class EmptyOptions extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Icon(Icons.info_outline, size: 40, color: Colors.grey),
             SizedBox(height: 12),
             Text(
               'No options available for this service yet.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: GoogleFonts.poppins(color: Colors.grey),
             ),
           ],
         ),

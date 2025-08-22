@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mychoice/data/models/recentworkmodel.dart';
+import 'package:mychoice/res/widgets/customtimewidgets.dart';
 import 'package:mychoice/view/cleaning_pestcontrol_screens/pestcontrol_confirmation_screen.dart';
 import 'package:mychoice/view/home_screens/index_screens.dart';
 import 'package:mychoice/viewmodel/addingmenspackages/Cartprovider.dart';
@@ -281,15 +282,18 @@ class SuccessView extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Total Amount',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500,fontSize: 18),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
                 Text(
                   rupee.format(totalPrice),
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                  ),
+                  style:  GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
                 ),
               ],
             ),

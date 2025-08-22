@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mychoice/view/bookings/userfeedback_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:mychoice/data/models/bookingmodel.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/res/widgets/custombuttons.dart';
 import 'package:mychoice/utils/routes/routes.dart';
+import 'package:mychoice/view/bookings/userfeedback_screen.dart';
 import 'package:mychoice/view/home_screens/index_screens.dart';
 import 'package:mychoice/viewmodel/bookingscreenmodels/bookingscreen_provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class Vieworderdertailsscreen extends StatefulWidget {
   final Booking booking;
-
   const Vieworderdertailsscreen({super.key, required this.booking});
 
   @override
@@ -38,13 +38,11 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
   List<Map<String, dynamic>> _safeMapList(Object? value) {
     if (value is List) {
       try {
-        return value.map((e) {
-          if (e is Map) return Map<String, dynamic>.from(e as Map);
+        return value.map<Map<String, dynamic>>((e) {
+          if (e is Map) return Map<String, dynamic>.from(e);
           return <String, dynamic>{};
         }).toList();
-      } catch (_) {
-        return <Map<String, dynamic>>[];
-      }
+      } catch (_) {}
     }
     return <Map<String, dynamic>>[];
   }
@@ -52,6 +50,7 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FA),
       body: Consumer<BookingProvider>(
         builder: (context, provider, _) {
           final current = provider.bookings.firstWhere(
@@ -61,18 +60,42 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
 
           return Skeletonizer(
             enabled: _isLoading,
-            child: SingleChildScrollView(
+            child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  _header(current),
-                  SizedBox(height: 20.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: _buildOrderDetails(context, current),
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  automaticallyImplyLeading: false,
+                  centerTitle: true,
+                  titleSpacing: 0,
+                  title: Text(
+                    "Order Details",
+                    style: GoogleFonts.poppins(
+                      color: Appcolor.blackcolor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18.sp,
+                    ),
                   ),
-                ],
-              ),
+                  leading: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.arrow_back, color: Appcolor.blackcolor),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      _TopHeader(booking: current),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
+                        child: _buildBody(context, current),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -80,57 +103,10 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
     );
   }
 
-  Widget _header(Booking booking) {
-    return Stack(
-      children: [
-        Container(
-          height: 200.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(25.r)),
-            image: DecorationImage(
-              image: NetworkImage(  booking.imageurl.isNotEmpty
-                  ? booking.imageurl
-                  : "https://images.pexels.com/photos/1054777/pexels-photo-1054777.jpeg",),
-              fit: BoxFit.cover,
-              colorFilter: const ColorFilter.mode(
-                Colors.black26,
-                BlendMode.color,
-              ),
-            ),
-          ),
-        ),
-        AppBar(
-          leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.arrow_back,
-              size: 24.sp,
-              color: Appcolor.blackcolor,
-            ),
-          ),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            "Order Details",
-            style: TextStyle(
-              fontSize: 20.sp,
-              color: Appcolor.blackcolor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrderDetails(BuildContext context, Booking booking) {
+  Widget _buildBody(BuildContext context, Booking booking) {
     final provider = context.read<BookingProvider>();
-
-    final extraItems = _safeMapList((booking as dynamic).extraWork);
     final selectedOptions = _safeMapList((booking as dynamic).selectedOptions);
-
+    final extraItems = _safeMapList((booking as dynamic).extraWork);
     final approvedExtraItems =
         (booking.extraWorkApproved == true)
             ? extraItems
@@ -139,98 +115,95 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _providerCard(booking),
-        SizedBox(height: 16.h),
-
-        if (booking.status == 'Pending') _otpBox(booking.otp),
-
-        SizedBox(height: 16.h),
-        _orderSummaryCard(booking, selectedOptions, approvedExtraItems),
-
-        SizedBox(height: 16.h),
-        _timelineCard(booking),
-
-        SizedBox(height: 16.h),
-        _paymentCard(booking),
-
-        if (extraItems.isNotEmpty && !(booking.extraWorkApproved == true)) ...[
-          SizedBox(height: 16.h),
-          _additionalWorkCard(
-            extraItems,
+        SizedBox(height: 12.h),
+        if (booking.status == 'Pending') _OtpCard(otp: booking.otp),
+        _OrderSummaryCard(
+          booking: booking,
+          selectedOptions: selectedOptions,
+          approvedExtra: approvedExtraItems,
+        ),
+        SizedBox(height: 12.h),
+        _TimelineCard(booking: booking),
+        SizedBox(height: 12.h),
+        _PaymentCard(booking: booking),
+        if (extraItems.isNotEmpty && booking.extraWorkApproved != true) ...[
+          SizedBox(height: 12.h),
+          _AdditionalWorkCard(
+            items: extraItems,
             onApprove: () => provider.approveExtraWork(booking.id),
             onReject: () => provider.rejectExtraWork(booking.id),
           ),
         ],
-
         if (booking.extraWorkApproved == true) ...[
-          SizedBox(height: 12.h),
-          _approvedBadge(),
+          SizedBox(height: 10.h),
+          _ApprovedBadge(),
         ],
-
-        SizedBox(height: 24.h),
-        _bottomButtons(context, booking),
         SizedBox(height: 20.h),
+        _BottomButtons(booking: booking),
       ],
     );
   }
+}
 
-  Widget _providerCard(Booking booking) {
+class _TopHeader extends StatelessWidget {
+  const _TopHeader({required this.booking});
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context) {
+    final themeBg = const LinearGradient(
+      colors: [Appcolor.whitecolor, Color(0xFFFFFFFF)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
+
     return Container(
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Appcolor.whitecolor,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
+      decoration: BoxDecoration(gradient: themeBg),
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
-            radius: 30.r,
+            radius: 28.r,
             backgroundImage: NetworkImage(
-              booking.providerImageUrl.isNotEmpty
-                  ? booking.providerImageUrl
+              booking.imageurl.isNotEmpty
+                  ? booking.imageurl
                   : "https://randomuser.me/api/portraits/men/32.jpg",
             ),
           ),
           SizedBox(width: 12.w),
-
           Expanded(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  booking.providerName.isNotEmpty
-                      ? booking.providerName
-                      : "Sharath",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.sp,
-                  ),
+                  booking.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  softWrap: false,
+                  style: GoogleFonts.poppins(
+                    color: Appcolor.blackcolor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16.sp,
+                  ),
                 ),
                 SizedBox(height: 4.h),
-
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star, color: Colors.amber, size: 14.sp),
-                    SizedBox(width: 4.w),
+                    Icon(
+                      Icons.receipt_long_rounded,
+                      size: 16.sp,
+                      color: Colors.grey[700],
+                    ),
+                    SizedBox(width: 6.w),
                     Flexible(
                       child: Text(
-                        '${booking.rating.toStringAsFixed(1)} (150+ jobs)',
-                        style: TextStyle(
+                        '#${booking.id}',
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w600,
                           fontSize: 12.sp,
-                          color: Colors.black54,
-                          fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        softWrap: false,
                       ),
                     ),
                   ],
@@ -238,335 +211,188 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
               ],
             ),
           ),
-
-          SizedBox(width: 8.w),
-
-          Flexible(fit: FlexFit.loose, child: _statusChip(booking.status)),
+          _StatusChip(status: booking.status),
         ],
       ),
     );
   }
+}
 
-  Widget _statusChip(String status) {
-    Color bg;
-    Color fg;
+class _OtpCard extends StatelessWidget {
+  const _OtpCard({required this.otp});
+  final String otp;
 
-    switch (status) {
-      case 'Completed':
-        bg = Colors.green.shade50;
-        fg = Colors.green.shade800;
-        break;
-      case 'Active':
-        bg = Colors.blue.shade50;
-        fg = Colors.blue.shade800;
-        break;
-      case 'Cancelled':
-        bg = Colors.red.shade50;
-        fg = Colors.red.shade800;
-        break;
-      default: // Pending
-        bg = Colors.orange.shade50;
-        fg = Colors.orange.shade800;
-    }
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: fg.withOpacity(.25)),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          color: fg,
-          fontWeight: FontWeight.w700,
-          fontSize: 12.sp,
-        ),
-      ),
-    );
-  }
-
-  Widget _otpBox(String otp) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return _Card(
       child: Column(
         children: [
           Text(
             otp,
-            style: TextStyle(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.poppins(
+              fontSize: 26.sp,
+              fontWeight: FontWeight.w800,
               letterSpacing: 2,
-              color: Colors.blueAccent,
+              color: const Color(0xFF0B57D0),
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 6.h),
           Text(
             'Share this OTP with the provider to start the job.',
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
             textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              fontSize: 12.5.sp,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _orderSummaryCard(
-    Booking booking,
-    List<Map<String, dynamic>> selectedOptions,
-    List<Map<String, dynamic>> approvedExtraItems,
-  ) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
+class _OrderSummaryCard extends StatelessWidget {
+  const _OrderSummaryCard({
+    required this.booking,
+    required this.selectedOptions,
+    required this.approvedExtra,
+  });
+
+  final Booking booking;
+  final List<Map<String, dynamic>> selectedOptions;
+  final List<Map<String, dynamic>> approvedExtra;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Order Summary :",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-          ),
-          SizedBox(height: 8.h),
-
-          _kv("Service", booking.service),
-          _kv("Date & Time", booking.dateTime),
-          _kv("Address", booking.address),
-
+          _SectionTitle('Order Summary'),
+          _KV('Service', booking.service),
+          _KV('Date & Time', booking.dateTime),
+          _KV('Address', booking.address),
           if (selectedOptions.isNotEmpty) ...[
-            SizedBox(height: 8.h),
-            Text(
-              "Selected Options",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
-            ),
-            SizedBox(height: 6.h),
-            ...selectedOptions.map(
-              (o) => Padding(
-                padding: EdgeInsets.only(bottom: 4.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        (o['title'] ?? '-').toString(),
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      o['price'] != null ? '₹${o['price']}.00' : '',
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            SizedBox(height: 10.h),
+            _SubTitle('Selected Options'),
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children:
+                  selectedOptions.map((o) {
+                    final title = (o['title'] ?? '-').toString();
+                    final price = o['price'] != null ? '₹${o['price']}' : '';
+                    return _Pill(title: title, trailing: price);
+                  }).toList(),
             ),
           ],
-
-          if (approvedExtraItems.isNotEmpty) ...[
+          if (approvedExtra.isNotEmpty) ...[
             SizedBox(height: 12.h),
-            Text(
-              "Approved Additional Work : ",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-            ),
-            SizedBox(height: 6.h),
-            ...approvedExtraItems.map(
-              (e) => Padding(
-                padding: EdgeInsets.only(bottom: 4.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        (e['title'] ?? '-').toString(),
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    // Text(
-                    //   e['price'] != null ? '₹${e['price']}.00' : '',
-                    //   style: TextStyle(
-                    //     fontSize: 13.sp,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
+            _SubTitle('Approved Additional Work'),
+            SizedBox(height: 8.h),
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children:
+                  approvedExtra.map((e) {
+                    final title = (e['title'] ?? '-').toString();
+                    return _Pill(title: title, kind: PillKind.success);
+                  }).toList(),
             ),
           ],
         ],
       ),
     );
   }
+}
 
-  Widget _timelineCard(Booking booking) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
+class _TimelineCard extends StatelessWidget {
+  const _TimelineCard({required this.booking});
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Order Timeline",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-          ),
-          SizedBox(height: 8.h),
-          ...booking.timeline
-              .map((item) => _timelineItem(item.event, item.time))
-              .toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _paymentCard(Booking booking) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Payment Details",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-          ),
-          SizedBox(height: 8.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Total Amount",
-                style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                booking.totalAmount,
-                style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-          SizedBox(height: 4.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Payment Mode",
-                style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                booking.paymentMode,
-                style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
-              ),
-            ],
+          _SectionTitle('Order Timeline'),
+          SizedBox(height: 6.h),
+          ...booking.timeline.map(
+            (item) => _StepTile(title: item.event, time: item.time),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _additionalWorkCard(
-    List<Map<String, dynamic>> items, {
-    required VoidCallback onApprove,
-    required VoidCallback onReject,
-  }) {
+class _PaymentCard extends StatelessWidget {
+  const _PaymentCard({required this.booking});
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context) {
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle('Payment Details'),
+          _RowSpace(
+            left: Text('Total Amount', style: _bold13),
+            right: Text(booking.totalAmount, style: _semibold13),
+          ),
+          SizedBox(height: 6.h),
+          _RowSpace(
+            left: Text('Payment Mode', style: _bold13),
+            right: Text(booking.paymentMode, style: _semibold13),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AdditionalWorkCard extends StatelessWidget {
+  const _AdditionalWorkCard({
+    required this.items,
+    required this.onApprove,
+    required this.onReject,
+  });
+
+  final List<Map<String, dynamic>> items;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context) {
     final total = items.fold<int>(0, (s, e) => s + ((e['price'] as int?) ?? 0));
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
-        ],
-      ),
+
+    return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Additional Work Proposed",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-          ),
-          SizedBox(height: 8.h),
-          ...items.map(
-            (e) => Padding(
+          _SectionTitle('Additional Work Proposed'),
+          SizedBox(height: 6.h),
+          ...items.map((e) {
+            final title = (e['title'] ?? '-').toString();
+            final price = (e['price'] as int?) ?? 0;
+            return Padding(
               padding: EdgeInsets.symmetric(vertical: 6.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      (e['title'] ?? '-').toString(),
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '₹${(e['price'] as int?) ?? 0}.00',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              child: _RowSpace(
+                left: Text(
+                  title,
+                  style: _semibold13.copyWith(color: Appcolor.blackcolor),
+                ),
+                right: Text('₹$price.00', style: _bold13),
               ),
-            ),
-          ),
+            );
+          }),
           const Divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Extra Total",
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '₹$total.00',
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
-              ),
-            ],
+          _RowSpace(
+            left: Text('Extra Total', style: _bold14),
+            right: Text('₹$total.00', style: _bold14),
           ),
           SizedBox(height: 12.h),
           Row(
@@ -578,11 +404,10 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
                     padding: EdgeInsets.symmetric(vertical: 12.h),
                   ),
                   child: Text(
-                    "Cancel",
-                    style: TextStyle(
+                    'Cancel',
+                    style: GoogleFonts.poppins(
                       color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -590,8 +415,8 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
               SizedBox(width: 12.w),
               Expanded(
                 child: ResumeButton(
+                  buttonText: 'Approve',
                   onPressed: onApprove,
-                  buttonText: "Approve",
                 ),
               ),
             ],
@@ -600,26 +425,28 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
       ),
     );
   }
+}
 
-  Widget _approvedBadge() {
+class _ApprovedBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: Colors.green.shade300),
+        border: Border.all(color: Appcolor.blackcolor),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 18.sp),
+          const Icon(Icons.check_circle, color: Colors.green),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(
               "Additional work approved & added to total",
-              style: TextStyle(
-                color: Colors.green.shade900,
-                fontWeight: FontWeight.w700,
+              style: GoogleFonts.poppins(
+                color: Appcolor.blackcolor,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -627,9 +454,14 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
       ),
     );
   }
+}
 
-  Widget _bottomButtons(BuildContext context, Booking booking) {
-    // ✅ If order is completed, show "Leave Feedback" instead of Reschedule/Cancel
+class _BottomButtons extends StatelessWidget {
+  const _BottomButtons({required this.booking});
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context) {
     if (booking.status == 'Completed') {
       return SizedBox(
         width: double.infinity,
@@ -643,7 +475,7 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
                       bookingId: booking.id,
                       service: booking.service,
                       providerName:
-                          (booking.providerName.isNotEmpty)
+                          booking.providerName.isNotEmpty
                               ? booking.providerName
                               : "Provider",
                     ),
@@ -654,24 +486,22 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
       );
     }
 
-    // 🔁 Default (your existing) buttons for other statuses
     return Row(
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteName.timesechudlescreen);
-            },
+            onPressed:
+                () =>
+                    Navigator.pushNamed(context, RouteName.timesechudlescreen),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Appcolor.sucesscolor),
               padding: EdgeInsets.symmetric(vertical: 12.h),
+              side: BorderSide(color: Appcolor.sucesscolor),
             ),
             child: Text(
-              "Reschedule",
-              style: TextStyle(
+              'Reschedule',
+              style: GoogleFonts.poppins(
                 color: Appcolor.sucesscolor,
-                fontWeight: FontWeight.bold,
-                fontSize: 14.sp,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -679,6 +509,7 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
         SizedBox(width: 12.w),
         Expanded(
           child: ResumeButton(
+            buttonText: 'Cancel',
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
@@ -688,44 +519,293 @@ class _VieworderdertailsscreenState extends State<Vieworderdertailsscreen> {
                         pageController: PageController(initialPage: 0),
                       ),
                 ),
-                (Route<dynamic> route) => false,
+                (route) => false,
               );
             },
-            buttonText: "Cancel",
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _kv(String k, String v) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 4.h),
-      child: Text(
-        "$k: $v",
-        style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold),
+class _Card extends StatelessWidget {
+  const _Card({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: const Color(0xFFECEEF3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
+      child: child,
     );
   }
+}
 
-  Widget _timelineItem(String event, String time) {
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text, style: _bold16);
+  }
+}
+
+class _SubTitle extends StatelessWidget {
+  const _SubTitle(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(text, style: _bold14.copyWith(color: Appcolor.blackcolor));
+  }
+}
+
+class _KV extends StatelessWidget {
+  const _KV(this.k, this.v);
+  final String k;
+  final String v;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w),
+      padding: EdgeInsets.only(top: 6.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 8.w),
+          SizedBox(
+            width: 110.w,
+            child: Text(k, style: _bold13.copyWith(color: Colors.grey[800])),
+          ),
           Expanded(
             child: Text(
-              '$event - $time',
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: Appcolor.blackcolor,
-                fontWeight: FontWeight.bold,
-              ),
+              v,
+              style: _semibold13.copyWith(color: Appcolor.blackcolor),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+enum PillKind { normal, success }
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.title,
+    this.trailing,
+    this.kind = PillKind.normal,
+  });
+  final String title;
+  final String? trailing;
+  final PillKind kind;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg =
+        kind == PillKind.success
+            ? const Color(0xFFEAF7ED)
+            : const Color(0xFFF2F5F9);
+    final border =
+        kind == PillKind.success
+            ? const Color(0xFFCDEAD3)
+            : const Color(0xFFE3E8EF);
+    final fg =
+        kind == PillKind.success
+            ? const Color(0xFF1B5E20)
+            : Appcolor.blackcolor;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              color: fg,
+              fontSize: 12.5.sp,
+            ),
+          ),
+          if (trailing != null) ...[
+            SizedBox(width: 8.w),
+            Text(
+              trailing!,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[700],
+                fontSize: 12.sp,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StepTile extends StatelessWidget {
+  const _StepTile({required this.title, required this.time});
+  final String title;
+  final String time;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              width: 10.r,
+              height: 10.r,
+              decoration: BoxDecoration(
+                color: Appcolor.blackcolor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Appcolor.primarycolor.withOpacity(.35),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+            ),
+            Container(width: 2, height: 22.h, color: const Color(0xFFE3E8EF)),
+          ],
+        ),
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 10.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: _semibold13.copyWith(color: Appcolor.blackcolor),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  time,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12.sp,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.status});
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg, fg, border;
+    switch (status) {
+      case 'Completed':
+        bg = const Color(0xFFEAF7ED);
+        fg = const Color(0xFF1B5E20);
+        border = const Color(0xFFCDEAD3);
+        break;
+      case 'Active':
+        bg = const Color(0xFFE7F1FF);
+        fg = const Color(0xFF0B57D0);
+        border = const Color(0xFFB3D1FF);
+        break;
+      case 'Cancelled':
+        bg = const Color(0xFFFDEAEA);
+        fg = const Color(0xFF8A1C1C);
+        border = const Color(0xFFF5CACA);
+        break;
+      default:
+        bg = const Color(0xFFFFF4E5);
+        fg = const Color(0xFFBF6A01);
+        border = const Color(0xFFFFE0B2);
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: border),
+      ),
+      child: Text(
+        status,
+        style: GoogleFonts.poppins(
+          color: fg,
+          fontWeight: FontWeight.w800,
+          fontSize: 12.sp,
+        ),
+      ),
+    );
+  }
+}
+
+final _bold16 = GoogleFonts.poppins(
+  fontWeight: FontWeight.w800,
+  fontSize: 16.sp,
+  color: Appcolor.blackcolor,
+);
+final _bold14 = GoogleFonts.poppins(
+  fontWeight: FontWeight.w800,
+  fontSize: 14.sp,
+  color: Appcolor.blackcolor,
+);
+final _bold13 = GoogleFonts.poppins(
+  fontWeight: FontWeight.w800,
+  fontSize: 13.sp,
+  color: Appcolor.blackcolor,
+);
+final _semibold13 = GoogleFonts.poppins(
+  fontWeight: FontWeight.w600,
+  fontSize: 13.sp,
+  color: Appcolor.blackcolor,
+);
+
+class _RowSpace extends StatelessWidget {
+  const _RowSpace({required this.left, required this.right});
+  final Widget left;
+  final Widget right;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [Expanded(child: left), right],
       ),
     );
   }

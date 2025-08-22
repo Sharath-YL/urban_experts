@@ -19,6 +19,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       Provider.of<BookingProvider>(context, listen: false).fetchBookings();
     });
   }
@@ -27,254 +28,405 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     ScreenUtil.init(context, designSize: const Size(375, 812));
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Column(
-          children: [
-            AppBar(
-              automaticallyImplyLeading: false,
-              centerTitle: true,
-              title: Text(
-                "History",
-                style: GoogleFonts.poppins(
-                  color: Appcolor.blackcolor,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Consumer<BookingProvider>(
-              builder: (context, bookingProvider, child) {
-                return Skeletonizer(
-                  enabled: bookingProvider.isLoading,
-                  child: _buildCompletedBookings(bookingProvider),
-                );
-              },
-            ),
-          ],
+      backgroundColor: const Color(0xFFF7F8FA),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          "History",
+          style: GoogleFonts.poppins(
+            color: Appcolor.blackcolor,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: Consumer<BookingProvider>(
+        builder: (context, bookingProvider, child) {
+          final completed =
+              bookingProvider.bookings
+                  .where((b) => b.status == 'Completed')
+                  .toList();
+
+          return Skeletonizer(
+            enabled: bookingProvider.isLoading,
+            child:
+                completed.isEmpty
+                    ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 40.h),
+                            Container(
+                              height: 88.r,
+                              width: 88.r,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.history_rounded,
+                                size: 40.sp,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            SizedBox(height: 16.h),
+                            Text(
+                              "No History Found",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16.sp,
+                                color: Appcolor.blackcolor,
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              "Completed bookings will appear here.",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.5.sp,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    : ListView.separated(
+                      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
+                      itemCount: completed.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                      itemBuilder: (context, index) {
+                        final booking = completed[index];
+                        return _AnimatedStagger(
+                          index: index,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                RouteName.viewordersetailsScreen,
+                                arguments: booking,
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(14.r),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14.r),
+                                border: Border.all(
+                                  color: const Color(0xFFECEEF3),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              padding: EdgeInsets.all(12.w),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '#${booking.id}',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14.sp,
+                                            color: Appcolor.blackcolor,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      _StatusChip(
+                                        text: booking.status,
+                                        bg: const Color(0xFFEAF7ED),
+                                        fg: const Color(0xFF1B5E20),
+                                        border: const Color(0xFFCDEAD3),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Text(
+                                    booking.title,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16.5.sp,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.2,
+                                      color: Appcolor.blackcolor,
+                                    ),
+                                  ),
+                                  if (booking.selectedOptions.isNotEmpty) ...[
+                                    SizedBox(height: 6.h),
+                                    Wrap(
+                                      spacing: 8.w,
+                                      runSpacing: 8.h,
+                                      children:
+                                          booking.selectedOptions.map((opt) {
+                                            final title =
+                                                opt['title']?.toString() ?? '';
+                                            final price =
+                                                opt['price']?.toString() ?? '';
+                                            return _OptionPill(
+                                              title: title,
+                                              price: price,
+                                            );
+                                          }).toList(),
+                                    ),
+                                  ],
+                                  SizedBox(height: 10.h),
+                                  const Divider(height: 1),
+                                  SizedBox(height: 10.h),
+                                  Row(
+                                    children: [
+                                      _IconText(
+                                        icon: Icons.event,
+                                        text: booking.dateTime,
+                                        flex: 1,
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      _IconText(
+                                        icon: Icons.payments_rounded,
+                                        text: '₹ ${booking.price}',
+                                        isEmphasis: true,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 6.h),
+                                  _IconText(
+                                    icon: Icons.location_on_rounded,
+                                    text: booking.location,
+                                    maxLines: 1,
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  Row(
+                                    children: [
+                                      if (booking.providerImageUrl.isNotEmpty)
+                                        CircleAvatar(
+                                          radius: 18.r,
+                                          backgroundImage: NetworkImage(
+                                            booking.providerImageUrl,
+                                          ),
+                                        ),
+                                      if (booking.providerImageUrl.isNotEmpty)
+                                        SizedBox(width: 10.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (booking.providerName.isNotEmpty)
+                                              Text(
+                                                booking.providerName,
+                                                style: GoogleFonts.poppins(
+                                                  color: Appcolor.blackcolor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 13.5.sp,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            SizedBox(height: 2.h),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.star_rounded,
+                                                  size: 16,
+                                                  color: Color(0xFFFFC107),
+                                                ),
+                                                SizedBox(width: 4.w),
+                                                Text(
+                                                  booking.rating
+                                                      .toStringAsFixed(1),
+                                                  style: GoogleFonts.poppins(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 12.5.sp,
+                                                    color: Appcolor.blackcolor,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  ' Ratings',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 12.sp,
+                                                    color: Colors.grey[700],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({
+    required this.text,
+    required this.bg,
+    required this.fg,
+    required this.border,
+  });
+  final String text;
+  final Color bg;
+  final Color fg;
+  final Color border;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: border),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w700,
+          color: fg,
         ),
       ),
     );
   }
+}
 
-  Widget _buildCompletedBookings(BookingProvider bookingProvider) {
-    final completedBookings =
-        bookingProvider.bookings
-            .where((booking) => booking.status == 'Completed')
-            .toList();
+class _OptionPill extends StatelessWidget {
+  const _OptionPill({required this.title, required this.price});
+  final String title;
+  final String price;
 
-    debugPrint(
-      'Filtered bookings in History: ${completedBookings.map((b) => b.status).join(', ')}',
-    );
-
-    if (completedBookings.isEmpty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF2F5F9),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: const Color(0xFFE3E8EF)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: 150.h),
-          // Image.asset("assets/icons/history.png", height: 100, width: 100),
-          // SizedBox(height: 30.h),
           Text(
-            "No History Found",
+            title,
             style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w500,
-              fontSize: 15,
+              fontSize: 12.5.sp,
+              color: Appcolor.blackcolor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Text(
+            '₹$price',
+            style: GoogleFonts.poppins(
+              fontSize: 12.sp,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
-      );
-    }
+      ),
+    );
+  }
+}
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: completedBookings.length,
-      itemBuilder: (context, index) {
-        final booking = completedBookings[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              RouteName.viewordersetailsScreen,
-              arguments: booking,
-            );
-          },
-          child: Container(
-            margin: EdgeInsets.only(bottom: 12.h),
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+class _IconText extends StatelessWidget {
+  const _IconText({
+    required this.icon,
+    required this.text,
+    this.isEmphasis = false,
+    this.maxLines,
+    this.flex,
+  });
+  final IconData icon;
+  final String text;
+  final bool isEmphasis;
+  final int? maxLines;
+  final int? flex;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18.sp, color: Colors.grey[700]),
+        SizedBox(width: 6.w),
+        Flexible(
+          child: Text(
+            text,
+            maxLines: maxLines,
+            overflow:
+                maxLines != null ? TextOverflow.ellipsis : TextOverflow.visible,
+            style: GoogleFonts.poppins(
+              fontSize: isEmphasis ? 14.sp : 12.5.sp,
+              fontWeight: isEmphasis ? FontWeight.w700 : FontWeight.w500,
+              color: isEmphasis ? Appcolor.blackcolor : Colors.grey[800],
+              height: 1.2,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '#${booking.id}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14.sp,
-                          color: Colors.blue,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      ),
-                    ),
-                    Flexible(
-                      fit: FlexFit.loose,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Appcolor.greycolor,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          booking.status,
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 6.h),
-                Text(
-                  booking.title,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (booking.selectedOptions.isNotEmpty) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    'Options:',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w500,
-                      color: Appcolor.greycolor,
-                    ),
-                  ),
-                  ...booking.selectedOptions.map(
-                    (option) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 2.h),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle,
-                            color: Appcolor.primarycolor,
-                            size: 16.sp,
-                          ),
-                          SizedBox(width: 8.w),
-                          Expanded(
-                            child: Text(
-                              option['title'],
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Appcolor.blackcolor,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '₹${option['price']}',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              color: Appcolor.blackcolor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-                SizedBox(height: 4.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        booking.dateTime,
-                        style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                      ),
-                    ),
-                    Text(
-                      '₹${booking.price}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15.sp,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  booking.location,
-                  style: TextStyle(fontSize: 13.sp, color: Colors.grey),
-                ),
-                SizedBox(height: 8.h),
-                Divider(thickness: 1, color: Appcolor.greycolor),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (booking.providerName.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.only(right: 10.w),
-                            child: Text(
-                              booking.providerName,
-                              style: TextStyle(
-                                color: Appcolor.blackcolor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        SizedBox(height: 5.h),
-                        Text(
-                          "⭐${booking.rating.toStringAsFixed(1)} Ratings",
-                          style: TextStyle(
-                            color: Appcolor.blackcolor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    if (booking.providerImageUrl.isNotEmpty)
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(booking.providerImageUrl),
-                      ),
-                  ],
-                ),
-              ],
-            ),
+          ),
+        ),
+      ],
+    );
+
+    if (flex != null) {
+      return Expanded(flex: flex!, child: content);
+    }
+    return content;
+  }
+}
+
+class _AnimatedStagger extends StatelessWidget {
+  const _AnimatedStagger({required this.index, required this.child});
+  final int index;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final delayMs = 40 * index;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 380 + delayMs),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, _) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, (1 - value) * 12),
+            child: child,
           ),
         );
       },

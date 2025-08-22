@@ -37,10 +37,10 @@ class _CleaningPestControlscreenState extends State<CleaningPestControlscreen> {
         automaticallyImplyLeading: false,
         title: Text(
           "Cleaning Control",
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: Appcolor.blackcolor,
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
           ),
         ),
         leading: Padding(

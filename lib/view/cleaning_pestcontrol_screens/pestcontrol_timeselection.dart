@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mychoice/res/components/customtextbutton.dart';
 import 'package:mychoice/res/widgets/customButton.dart';
-import 'package:mychoice/res/widgets/custombottomsheet.dart';
+import 'package:mychoice/res/widgets/customtimewidgets.dart';
 import 'package:mychoice/utils/routes/routes.dart';
+import 'package:mychoice/view/Timesedules/timesecdule.dart';
 import 'package:mychoice/viewmodel/location_view/location_provider.dart';
 import 'package:mychoice/viewmodel/timesehedules/timesehdule_view_provider.dart';
 import 'package:provider/provider.dart';
@@ -55,10 +57,11 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
   int _unitPrice(dynamic p) =>
       p is num ? p.toInt() : int.tryParse(p?.toString() ?? '') ?? 0;
 
-  void showConfirmationSheet({
+  Future<void> showConfirmationSheet({
     required BuildContext context,
     required ControlPestModel item,
-  }) {
+  }) async {
+    final parentNavigator = Navigator.of(context);
     final schedule = context.read<TimeScheduleViewProvider>();
 
     final DateTime selectedDate = schedule.selectedDate;
@@ -79,10 +82,12 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
     String workline =
         (item.title ?? '').trim().isNotEmpty ? item.title! : 'Pest Control';
 
-    showModalBottomSheet(
+    final bool? goNext = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: false,
       backgroundColor: Colors.white,
+      useRootNavigator: true,
+
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
@@ -106,7 +111,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                 const SizedBox(height: 4),
                 Text(
                   'Confirmation',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Appcolor.blackcolor,
@@ -116,18 +121,18 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                 Text(
                   placeLine,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: Appcolor.blackcolor,
                   ),
                 ),
                 Text(
                   workline,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: Appcolor.blackcolor,
                   ),
                 ),
@@ -135,8 +140,9 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                 Text(
                   'at $timeLabel, $formattedDate',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 13,
+                    fontWeight: FontWeight.w500,
                     color: Appcolor.blackcolor.withOpacity(0.7),
                   ),
                 ),
@@ -146,11 +152,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                     ResumeButton(
                       buttonText: "continue",
                       onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          RouteName.pestcontrolconfirmationscreen,
-                          arguments: widget.id,
-                        );
+                        Navigator.of(ctx).pop(true);
                       },
                     ),
                     const SizedBox(height: 15),
@@ -159,7 +161,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                       child: SizedBox(
                         width: double.infinity,
                         child: OutlinedButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
+                          onPressed: () => Navigator.of(ctx).pop(false),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             side: BorderSide(color: Appcolor.blackcolor),
@@ -169,7 +171,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                           ),
                           child: Text(
                             'Cancel',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Appcolor.blackcolor,
                               fontWeight: FontWeight.w700,
                             ),
@@ -185,6 +187,13 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
         );
       },
     );
+
+    if (goNext == true && mounted) {
+      parentNavigator.pushNamed(
+        RouteName.pestcontrolconfirmationscreen,
+        arguments: widget.id,
+      );
+    }
   }
 
   void openLocationSheet(
@@ -234,13 +243,13 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                         SizedBox(height: 8.h),
                         Text(
                           "Add your Address",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Appcolor.blackcolor,
                             fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16.h),
+                        SizedBox(height: 20.h),
 
                         InputForm(
                           title: "Address",
@@ -258,7 +267,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                         ),
                         SizedBox(height: 20.h),
 
-                        Custombutton(
+                        ResumeButton(
                           buttonText: "Continue",
                           onPressed: () {
                             Navigator.pop(ctx);
@@ -312,7 +321,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                     children: [
                       Text(
                         "Saved Address",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor,
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
@@ -333,7 +342,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                             SizedBox(width: 6.w),
                             Text(
                               "Add another address",
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: Appcolor.blackcolor,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15.sp,
@@ -356,10 +365,10 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                           Expanded(
                             child: Text(
                               statusText,
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 color: Appcolor.blackcolor,
                                 fontSize: 13.sp,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w600,
                                 height: 1.35,
                               ),
                             ),
@@ -444,6 +453,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
 
         return Scaffold(
           appBar: AppBar(
+            surfaceTintColor: Appcolor.whitecolor,
             backgroundColor: Appcolor.whitecolor,
             centerTitle: true,
             automaticallyImplyLeading: false,
@@ -464,10 +474,10 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
             ),
             title: Text(
               item.title,
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 color: Appcolor.blackcolor,
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                fontSize: 17,
               ),
             ),
           ),
@@ -493,18 +503,19 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                     children: [
                       Text(
                         "₹${grandTotal.toStringAsFixed(0)}",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: 20,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         "${pestcontroprovider.totalSelectedCount} item(s)  • inc. all taxes",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Appcolor.blackcolor.withOpacity(0.6),
                           fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -533,11 +544,11 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                               // );
                               openLocationSheet(context, schedule, item!);
                             },
-                    child: const Text(
+                    child: Text(
                       "Proceed",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         fontSize: 16,
                       ),
                     ),
@@ -570,6 +581,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                     );
                   },
                 ),
+                SizedBox(height: 5.0.h),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -578,9 +590,9 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                   ),
                   child: Text(
                     "Appointment",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Appcolor.blackcolor,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
                   ),
@@ -611,6 +623,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                 const SizedBox(height: 16),
 
                 const SectionHeader(title: "Morning Slots"),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -633,6 +646,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                 ),
 
                 const SectionHeader(title: "Afternoon"),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -645,6 +659,7 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
                         schedule.afternoonSlots
                             .map(
                               (t) => TimeChip(
+                                // disabled: is,
                                 label: t,
                                 selected: schedule.selectedTimeSlot == t,
                                 onTap: () => schedule.setSelectedTimeSlot(t),
@@ -660,295 +675,6 @@ class _PestcontrolTimeselectionState extends State<PestcontrolTimeselection> {
           ),
         );
       },
-    );
-  }
-}
-
-class SelectedLineTile extends StatelessWidget {
-  final String name;
-  final int qty;
-  final int unit;
-  final int total;
-
-  const SelectedLineTile({
-    super.key,
-    required this.name,
-    required this.qty,
-    required this.unit,
-    required this.total,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        padding: EdgeInsets.all(12.w),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.grey.shade50, Colors.grey.shade100],
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Leading icon
-            Container(
-              width: 36.w,
-              height: 36.w,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: const Icon(Icons.cleaning_services_outlined, size: 20),
-            ),
-            SizedBox(width: 10.w),
-
-            // Title + equation
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name + qty chip
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Tooltip(
-                          message: name,
-                          child: Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14.sp,
-                              color: Appcolor.blackcolor,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 4.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(999.r),
-                          border: Border.all(
-                            color: Colors.black.withOpacity(0.08),
-                          ),
-                        ),
-                        child: Text(
-                          'x$qty',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11.sp,
-                            color: Appcolor.blackcolor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 6.h),
-
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: Appcolor.blackcolor.withOpacity(0.75),
-                        fontWeight: FontWeight.w600,
-                      ),
-                      children: [
-                        TextSpan(text: '₹$unit'),
-                        const TextSpan(text: ' × '),
-                        TextSpan(text: '$qty'),
-                        const TextSpan(text: ' = '),
-                        TextSpan(
-                          text: '₹$total',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: Appcolor.blackcolor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(width: 10.w),
-
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                color: Appcolor.blackcolor,
-                borderRadius: BorderRadius.circular(12.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.07),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Text(
-                '₹$total',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13.sp,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DatePill extends StatelessWidget {
-  final String labelTop;
-  final String labelBottom;
-  final bool selected;
-  final VoidCallback onTap;
-  const DatePill({
-    required this.labelTop,
-    required this.labelBottom,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color border =
-        selected
-            ? Appcolor.primarycolor
-            : Theme.of(context).primaryColor.withOpacity(0.35);
-    final Color fill = selected ? Appcolor.whitecolor : Colors.white;
-    final Color text = selected ? Appcolor.blackcolor : Colors.black87;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 64,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: fill,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: border, width: selected ? 1.5 : 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              labelTop,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: text,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              labelBottom,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: text,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SectionHeader extends StatelessWidget {
-  final String title;
-  const SectionHeader({super.key, required this.title});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 6),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: Appcolor.blackcolor,
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TimeChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-  const TimeChip({
-    super.key,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color border =
-        selected
-            ? Appcolor.primarycolor
-            : Theme.of(context).primaryColor.withOpacity(0.35);
-    final Color fill = selected ? Appcolor.whitecolor : Colors.white;
-    final Color text = selected ? Appcolor.blackcolor : Colors.black87;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: fill,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: border, width: selected ? 1.4 : 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: text,
-            fontSize: 13,
-          ),
-        ),
-      ),
     );
   }
 }

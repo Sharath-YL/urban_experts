@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
+import 'package:mychoice/res/widgets/customHomeappbarwidget.dart';
 import 'package:mychoice/res/widgets/customMostbookedservices.dart';
 import 'package:mychoice/res/widgets/custombestservices.dart';
 import 'package:mychoice/res/widgets/customcoroselwidget.dart';
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Appcolor.whitecolor,
-      appBar: _HomeAppBar(
+      appBar: HomeAppBar(
         line1: _getFirstLineAddress(locationProvider.address ?? ""),
         line2: _getRemainingAddress(locationProvider.address ?? ""),
         controller: _searchController,
@@ -266,13 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 2.0.sp,
-                        vertical: 10.0.h,
-                      ),
-                      child: Custombestservices(),
-                    ),
+                    Custombestservices(),
                   ],
                 ),
               ),
@@ -303,163 +298,5 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
     return "";
-  }
-}
-
-// class TransformCarousel extends StatelessWidget {
-//   const TransformCarousel({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     List<String> images = [
-//       "assets/images/image1.jpg",
-//       "assets/images/acimage.jpg",
-//       "assets/images/plumber.webp",
-//     ];
-
-//     return ScrollConfiguration(
-//       behavior: AppScrollBehavior(),
-//       child: CustomScrollView(
-//         slivers: [
-//           SliverToBoxAdapter(
-//             child: SizedBox(
-//               height: 210,
-//               child: ListView.builder(
-//                 scrollDirection: Axis.horizontal,
-
-//                 itemCount: images.length,
-//                 itemBuilder: (context, index) {
-//                   return Padding(
-//                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-//                     child: Container(
-//                       width: 300,
-//                       height: 200,
-//                       decoration: BoxDecoration(
-//                         borderRadius: BorderRadius.circular(12),
-//                         image: DecorationImage(
-//                           image: AssetImage(images[index]),
-//                           fit: BoxFit.cover,
-//                         ),
-//                         boxShadow: [
-//                           BoxShadow(
-//                             color: Colors.black.withOpacity(0.2),
-//                             blurRadius: 8,
-//                             offset: const Offset(0, 4),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   );
-//                 },
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-class AppScrollBehavior extends ScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices {
-    return {...super.dragDevices, PointerDeviceKind.mouse};
-  }
-}
-
-class _HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _HomeAppBar({
-    required this.line1,
-    required this.line2,
-    required this.controller,
-    this.onBellTap,
-  });
-
-  final String line1;
-  final String line2;
-  final TextEditingController controller;
-  final VoidCallback? onBellTap;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(160);
-
-  @override
-  Widget build(BuildContext context) {
-    final locationProvider = Provider.of<LocationProvider>(context);
-
-    return AppBar(
-      backgroundColor: Appcolor.blackcolor,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      centerTitle: false,
-      toolbarHeight: 170,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-      ),
-      flexibleSpace: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Skeletonizer(
-                      enabled: locationProvider.isLoading,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            line1,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              color: Appcolor.whitecolor,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            line2,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              color: Appcolor.whitecolor,
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: onBellTap,
-                    icon: const Icon(
-                      Icons.notifications_none,
-                      color: Appcolor.whitecolor,
-                      size: 25,
-                    ),
-                    tooltip: 'Notifications',
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 20.h),
-
-              Skeletonizer(
-                enabled: locationProvider.isLoading,
-                child: SearchTextField(controller: controller),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

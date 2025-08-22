@@ -75,10 +75,10 @@ class BookingProvider with ChangeNotifier {
     int _toInt(dynamic v) =>
         v is num ? v.toInt() : int.tryParse('${v ?? ''}') ?? 0;
 
-       final int totalPrice =
-          selectedOptions.isNotEmpty
-              ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
-              : serviceitem.price;
+    final int totalPrice =
+        selectedOptions.isNotEmpty
+            ? selectedOptions.fold(0, (sum, m) => sum + (m['price'] as int))
+            : serviceitem.price;
 
     final newBooking = Booking(
       id: bookingId,

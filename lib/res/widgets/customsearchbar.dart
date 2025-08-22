@@ -4,17 +4,12 @@ import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/viewmodel/theme_view/theme_view_model.dart';
 import 'package:provider/provider.dart';
 
-
 class SearchTextField extends StatelessWidget {
-  final TextEditingController
-      controller; 
-  final Function(String)? onChanged; 
+  final TextEditingController controller;
+  final Function(String)? onChanged;
 
-  const SearchTextField({
-    Key? key,
-    required this.controller,
-    this.onChanged,
-  }) : super(key: key);
+  const SearchTextField({Key? key, required this.controller, this.onChanged})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +21,7 @@ class SearchTextField extends StatelessWidget {
       decoration: BoxDecoration(
         color: themeProvider.isDarkMode ? Colors.black : Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: Appcolor.blackcolor,
-        ),
+        border: Border.all(color: Appcolor.blackcolor),
       ),
       child: Center(
         child: TextFormField(
@@ -39,7 +32,7 @@ class SearchTextField extends StatelessWidget {
             contentPadding: EdgeInsets.symmetric(vertical: 0.8.h),
             border: InputBorder.none,
             icon: Padding(
-              padding:  EdgeInsets.only(left: 20.0.sp),
+              padding: EdgeInsets.only(left: 20.0.sp),
               child: Icon(
                 Icons.search,
                 color: Appcolor.blackcolor,
@@ -47,10 +40,7 @@ class SearchTextField extends StatelessWidget {
               ),
             ),
             hintText: "Search here",
-            hintStyle: TextStyle(
-              color: Appcolor.blackcolor,
-              fontSize: 17.sp,
-            ),
+            hintStyle: TextStyle(color: Appcolor.blackcolor, fontSize: 17.sp),
           ),
           onChanged: onChanged,
         ),

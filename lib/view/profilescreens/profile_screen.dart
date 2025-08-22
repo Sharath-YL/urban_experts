@@ -473,10 +473,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildSectionCard(
                 title: 'SETTINGS',
                 children: [
-                  _buildListTile('Select Theme', Icons.settings, () {
-                    showthemeDialog(context);
-                  }),
-                  _divider(),
+                  // _buildListTile('Select Theme', Icons.settings, () {
+                  //   showthemeDialog(context);
+                  // }),
+                  // _divider(),
                   _buildListTile('Log Out', Icons.logout, _showDialog),
                   _divider(),
                   _buildListTile(
