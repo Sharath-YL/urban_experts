@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomescreenviewProvider()),
         ChangeNotifierProvider(create: (_) => TimeScheduleViewProvider()),
         ChangeNotifierProvider(create: (_) => ControPestProvider()),
+        // ChangeNotifierProvider(create: (_)=>SearchProvider(context.read<HomescreenviewProvider>()))
       ],
       child: ScreenUtilInit(
         designSize: const Size(411.42857142857144, 867.4285714285714),
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
                       : themeModel.isDarkMode
                       ? ThemeMode.dark
                       : ThemeMode.light,
-              initialRoute: RouteName.onboardingscreen,
+              initialRoute: RouteName.splashscreen,
               onGenerateRoute: Routes.generateRoute,
             );
           },

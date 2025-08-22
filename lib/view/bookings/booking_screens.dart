@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/data/models/bookingmodel.dart';
 import 'package:mychoice/res/constants/colors.dart';
+import 'package:mychoice/res/widgets/customemptywidget.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 import 'package:mychoice/viewmodel/bookingscreenmodels/bookingscreen_provider.dart';
 import 'package:provider/provider.dart';
@@ -129,7 +130,7 @@ class _BookingScreensState extends State<BookingScreens> {
                               .toList();
 
                       if (filtered.isEmpty) {
-                        return _EmptyState(status: value);
+                        return EmptyState(status: value);
                       }
 
                       return ListView.separated(
@@ -138,7 +139,7 @@ class _BookingScreensState extends State<BookingScreens> {
                         separatorBuilder: (_, __) => SizedBox(height: 10.h),
                         itemBuilder: (context, index) {
                           final booking = filtered[index];
-                          return _AnimatedStagger(
+                          return AnimatedStagger(
                             index: index,
                             child: _BookingCard(
                               booking: booking,
@@ -259,9 +260,9 @@ class _BookingCard extends StatelessWidget {
             SizedBox(height: 10.h),
             Row(
               children: [
-                _IconText(icon: Icons.event, text: booking.dateTime, flex: 1),
+                IconText(icon: Icons.event, text: booking.dateTime, flex: 1),
                 SizedBox(width: 8.w),
-                _IconText(
+                IconText(
                   icon: Icons.payments_rounded,
                   text: '₹ ${booking.price}',
                   isEmphasis: true,
@@ -269,7 +270,7 @@ class _BookingCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 6.h),
-            _IconText(
+            IconText(
               icon: Icons.location_on_rounded,
               text: booking.location,
               maxLines: 1,
@@ -415,8 +416,8 @@ class _OptionPill extends StatelessWidget {
   }
 }
 
-class _IconText extends StatelessWidget {
-  const _IconText({
+class IconText extends StatelessWidget {
+  const IconText({
     required this.icon,
     required this.text,
     this.isEmphasis = false,
@@ -491,8 +492,8 @@ class _FilledActionButton extends StatelessWidget {
   }
 }
 
-class _AnimatedStagger extends StatelessWidget {
-  const _AnimatedStagger({required this.index, required this.child});
+class AnimatedStagger extends StatelessWidget {
+  const AnimatedStagger({required this.index, required this.child});
   final int index;
   final Widget child;
 
@@ -516,66 +517,7 @@ class _AnimatedStagger extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.status});
-  final String status;
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 40.h),
-            Container(
-              height: 88.r,
-              width: 88.r,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.event_busy_rounded,
-                size: 40.sp,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              "No $status bookings",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w700,
-                fontSize: 16.sp,
-                color: Appcolor.blackcolor,
-              ),
-            ),
-            SizedBox(height: 6.h),
-            Text(
-              "Bookings in this category will appear here.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w500,
-                fontSize: 12.5.sp,
-                color: Colors.grey[700],
-              ),
-            ),
-            SizedBox(height: 40.h),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StatusColors {
   const _StatusColors(this.bg, this.fg, this.border);

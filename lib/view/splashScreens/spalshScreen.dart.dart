@@ -4,14 +4,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mychoice/res/constants/colors.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 
-class Onboardingscreen extends StatefulWidget {
-  const Onboardingscreen({super.key});
+class Spalshscreen extends StatefulWidget {
+  const Spalshscreen({super.key});
 
   @override
-  State<Onboardingscreen> createState() => _OnboardingscreenState();
+  State<Spalshscreen> createState() => _SpalshscreenState();
 }
 
-class _OnboardingscreenState extends State<Onboardingscreen> {
+class _SpalshscreenState extends State<Spalshscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

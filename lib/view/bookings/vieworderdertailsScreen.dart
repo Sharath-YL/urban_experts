@@ -774,17 +774,17 @@ class _StatusChip extends StatelessWidget {
 }
 
 final _bold16 = GoogleFonts.poppins(
-  fontWeight: FontWeight.w800,
+  fontWeight: FontWeight.w500,
   fontSize: 16.sp,
   color: Appcolor.blackcolor,
 );
 final _bold14 = GoogleFonts.poppins(
-  fontWeight: FontWeight.w800,
+  fontWeight: FontWeight.w500,
   fontSize: 14.sp,
   color: Appcolor.blackcolor,
 );
 final _bold13 = GoogleFonts.poppins(
-  fontWeight: FontWeight.w800,
+  fontWeight: FontWeight.w400,
   fontSize: 13.sp,
   color: Appcolor.blackcolor,
 );

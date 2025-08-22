@@ -9,7 +9,7 @@ class RouteName {
   static const String bookingscreen = "BookingScreens";
   static const String timesechudlescreen = "TimesecduleScreen";
   static const String confirmbookingscreen = "Confirmbookingscreen";
-  static const String onboardingscreen = "Onboardingscreen";
+  static const String splashscreen = "Spalshscreen";
   static const String signupscreen = "Signupscreen";
   static const String OtpScreen = "Otpscreen";
   static const String locationscreen = "LocationScreen";

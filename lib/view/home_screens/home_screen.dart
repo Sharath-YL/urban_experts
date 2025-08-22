@@ -7,7 +7,6 @@ import 'package:mychoice/res/widgets/customHomeappbarwidget.dart';
 import 'package:mychoice/res/widgets/customMostbookedservices.dart';
 import 'package:mychoice/res/widgets/custombestservices.dart';
 import 'package:mychoice/res/widgets/customcoroselwidget.dart';
-import 'package:mychoice/res/widgets/customsearchbar.dart';
 import 'package:mychoice/utils/routes/routes.dart';
 import 'package:mychoice/viewmodel/homescreenview_model/homescreenview_provider.dart';
 import 'package:mychoice/viewmodel/location_view/location_provider.dart';
@@ -188,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: GoogleFonts.poppins(
                                       color: Appcolor.blackcolor,
                                       fontSize: 14.sp,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,

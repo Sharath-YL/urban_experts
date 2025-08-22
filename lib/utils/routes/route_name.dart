@@ -18,7 +18,7 @@ import 'package:mychoice/view/descriptions/commonservicesscreen.dart';
 import 'package:mychoice/view/home_screens/home_screen.dart';
 import 'package:mychoice/view/home_screens/notifications_screen.dart';
 import 'package:mychoice/view/locationscreens/location_screen.dart';
-import 'package:mychoice/view/onboardingscreens/onboardingscreen.dart';
+import 'package:mychoice/view/splashScreens/spalshScreen.dart.dart';
 import 'package:mychoice/view/profilescreens/editprofile_screen.dart';
 import 'package:mychoice/view/profilescreens/privacy_policyscreen.dart';
 import 'package:mychoice/view/profilescreens/profile_screen.dart';
@@ -86,8 +86,8 @@ class Routes {
                 ),
           );
         }
-      case RouteName.onboardingscreen:
-        return MaterialPageRoute(builder: (context) => Onboardingscreen());
+      case RouteName.splashscreen:
+        return MaterialPageRoute(builder: (context) => Spalshscreen());
       case RouteName.bookingscreen:
         return MaterialPageRoute(builder: (context) => BookingScreens());
       case RouteName.timesechudlescreen:
@@ -128,13 +128,13 @@ class Routes {
         return MaterialPageRoute(builder: (context) => TermsConditionsScreen());
 
       case RouteName.OtpScreen:
-        return MaterialPageRoute(builder: (context) => Otpscreen()); 
-      case RouteName.profilescreen: 
-        return MaterialPageRoute(builder: (context)=>ProfileScreen());
+        return MaterialPageRoute(builder: (context) => Otpscreen());
+      case RouteName.profilescreen:
+        return MaterialPageRoute(builder: (context) => ProfileScreen());
       case RouteName.locationscreen:
-        return MaterialPageRoute(builder: (context) => LocationScreen()); 
-      case RouteName.editprofilescreen: 
-        return MaterialPageRoute(builder: (context)=>EditprofileScreen());
+        return MaterialPageRoute(builder: (context) => LocationScreen());
+      case RouteName.editprofilescreen:
+        return MaterialPageRoute(builder: (context) => EditprofileScreen());
 
       case RouteName.notificationscreen:
         return MaterialPageRoute(builder: (context) => NotificationsScreen());
