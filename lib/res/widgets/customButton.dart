@@ -4,7 +4,7 @@ import 'package:mychoice/res/constants/colors.dart';
 
 class Custombutton extends StatelessWidget {
   final String buttonText;
-  void Function()? onPressed;
+  void Function()? onPressed; 
 
   Custombutton({super.key, required this.buttonText, required this.onPressed});
 
